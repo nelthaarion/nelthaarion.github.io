@@ -1,4 +1,1375 @@
-<div class="" style="min-height: 100vh;">
-    <div class="" style="display: flex; justify-content: center; align-items: center; ">Breeze Go web framework</div>
-    <div class="" style="display: flex; justify-content: center; align-items: center; ">Comming Soon</div>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Breeze — High-Performance HTTP Framework for Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#080B10;
+  --bg2:#0D1117;
+  --card:#111827;
+  --border:#1E2D40;
+  --cyan:#00E5FF;
+  --cyan-dim:#007A8A;
+  --white:#E8EDF2;
+  --dim:#8899AA;
+  --dim2:#4A5568;
+  --green:#39FF14;
+  --yellow:#FFD600;
+  --red:#FF4455;
+  --purple:#BD93F9;
+  --font-mono:'JetBrains Mono',monospace;
+  --font-body:'Inter',sans-serif;
+}
+
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--font-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 2rem;height:60px;
+  background:rgba(8,11,16,0.85);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.nav-logo{font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:var(--cyan);letter-spacing:-.02em;text-decoration:none}
+.nav-logo span{color:var(--white);opacity:.5}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:.85rem;font-family:var(--font-mono);letter-spacing:.04em;transition:color .2s}
+.nav-links a:hover{color:var(--cyan)}
+.nav-cta{
+  font-family:var(--font-mono);font-size:.8rem;font-weight:600;
+  padding:.45rem 1.1rem;border-radius:4px;
+  background:var(--cyan);color:#000;text-decoration:none;letter-spacing:.04em;
+  transition:opacity .2s;
+}
+.nav-cta:hover{opacity:.85}
+
+/* ── SECTIONS ── */
+section{padding:6rem 0}
+.container{max-width:1100px;margin:0 auto;padding:0 2rem}
+.section-label{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.18em;
+  color:var(--cyan);text-transform:uppercase;margin-bottom:1rem;display:block;
+}
+
+/* ── HERO ── */
+#hero{
+  min-height:100vh;display:flex;align-items:center;padding-top:60px;
+  background:radial-gradient(ellipse 60% 50% at 70% 50%, rgba(0,229,255,.05) 0%, transparent 70%);
+  position:relative;overflow:hidden;
+}
+#hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 80% at 50% 120%, rgba(0,229,255,.04) 0%, transparent 60%);
+  pointer-events:none;
+}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.hero-eyebrow{
+  font-family:var(--font-mono);font-size:.75rem;letter-spacing:.2em;
+  color:var(--cyan);text-transform:uppercase;margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:.6rem;
+}
+.hero-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--cyan)}
+h1{
+  font-family:var(--font-mono);font-size:3.8rem;font-weight:700;
+  line-height:1.05;letter-spacing:-.04em;
+  color:var(--white);margin-bottom:1.5rem;
+}
+h1 em{color:var(--cyan);font-style:normal}
+.hero-sub{
+  font-size:1.05rem;color:var(--dim);line-height:1.7;
+  max-width:460px;margin-bottom:2.5rem;
+}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{
+  font-family:var(--font-mono);font-weight:600;font-size:.85rem;
+  padding:.75rem 1.8rem;border-radius:4px;
+  background:var(--cyan);color:#000;text-decoration:none;letter-spacing:.04em;
+  transition:all .2s;border:none;cursor:pointer;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 0 20px rgba(0,229,255,.3)}
+.btn-ghost{
+  font-family:var(--font-mono);font-weight:500;font-size:.85rem;
+  padding:.75rem 1.8rem;border-radius:4px;
+  border:1px solid var(--border);color:var(--dim);text-decoration:none;letter-spacing:.04em;
+  transition:all .2s;background:transparent;cursor:pointer;
+}
+.btn-ghost:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* stats row */
+.hero-stats{display:flex;gap:2.5rem;margin-top:3rem;padding-top:2.5rem;border-top:1px solid var(--border)}
+.stat-val{font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--cyan)}
+.stat-lbl{font-size:.78rem;color:var(--dim);margin-top:.2rem;letter-spacing:.04em}
+
+/* ── TERMINAL ── */
+.terminal{
+  background:#0a0e14;border:1px solid var(--border);border-radius:8px;
+  overflow:hidden;box-shadow:0 0 60px rgba(0,229,255,.06);
+  font-family:var(--font-mono);
+}
+.terminal-bar{
+  background:#111827;padding:.7rem 1rem;display:flex;align-items:center;gap:.5rem;
+  border-bottom:1px solid var(--border);
+}
+.dot{width:12px;height:12px;border-radius:50%}
+.dot-r{background:#FF5F57}
+.dot-y{background:#FFBD2E}
+.dot-g{background:#28CA41}
+.terminal-file{
+  margin-left:auto;font-size:.72rem;color:var(--dim2);letter-spacing:.04em;
+}
+.terminal-body{padding:1.5rem;font-size:.82rem;line-height:1.75;min-height:340px}
+.t-comment{color:#4A5568}
+.t-kw{color:var(--purple)}
+.t-fn{color:var(--cyan)}
+.t-str{color:var(--yellow)}
+.t-num{color:#FF79C6}
+.t-pkg{color:var(--green)}
+.t-type{color:#FFB86C}
+.cursor{
+  display:inline-block;width:2px;height:1em;background:var(--cyan);
+  vertical-align:text-bottom;animation:blink .9s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ── FEATURE GRID ── */
+#features{background:var(--bg2)}
+.section-title{
+  font-family:var(--font-mono);font-size:2rem;font-weight:700;
+  letter-spacing:-.03em;margin-bottom:.75rem;
+}
+.section-desc{color:var(--dim);max-width:540px;line-height:1.7;margin-bottom:3.5rem}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5px;background:var(--border)}
+.feat-card{
+  background:var(--card);padding:2rem;
+  transition:background .2s;
+}
+.feat-card:hover{background:#161d2c}
+.feat-icon{
+  width:40px;height:40px;border-radius:6px;
+  background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:1.25rem;font-size:1.1rem;
+}
+.feat-title{font-family:var(--font-mono);font-size:.95rem;font-weight:600;margin-bottom:.6rem;color:var(--white)}
+.feat-desc{font-size:.85rem;color:var(--dim);line-height:1.65}
+
+/* ── DOCS ── */
+#docs{padding:0}
+.docs-layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.docs-sidebar{
+  position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;
+  background:var(--bg2);border-right:1px solid var(--border);
+  padding:2rem 0;
+}
+.docs-sidebar::-webkit-scrollbar{width:4px}
+.docs-sidebar::-webkit-scrollbar-track{background:transparent}
+.docs-sidebar::-webkit-scrollbar-thumb{background:var(--border)}
+.sidebar-section{margin-bottom:1.5rem;padding:0 1.5rem}
+.sidebar-head{
+  font-family:var(--font-mono);font-size:.68rem;letter-spacing:.16em;
+  color:var(--dim2);text-transform:uppercase;margin-bottom:.6rem;display:block;
+}
+.sidebar-links{list-style:none}
+.sidebar-links a{
+  display:block;padding:.35rem 0;font-size:.82rem;font-family:var(--font-mono);
+  color:var(--dim);text-decoration:none;transition:color .15s;
+}
+.sidebar-links a:hover,.sidebar-links a.active{color:var(--cyan)}
+.docs-content{padding:3rem 4rem}
+
+/* doc section */
+.doc-section{margin-bottom:4rem;padding-bottom:4rem;border-bottom:1px solid var(--border)}
+.doc-section:last-child{border-bottom:none}
+.doc-section h2{
+  font-family:var(--font-mono);font-size:1.6rem;font-weight:700;
+  letter-spacing:-.03em;margin-bottom:.5rem;color:var(--white);
+}
+.doc-section h3{
+  font-family:var(--font-mono);font-size:1.05rem;font-weight:600;
+  color:var(--cyan);margin:2rem 0 .75rem;
+}
+.doc-section p{color:var(--dim);line-height:1.75;margin-bottom:1rem}
+.doc-section ul{padding-left:1.4rem;margin-bottom:1rem}
+.doc-section li{color:var(--dim);line-height:1.7;margin-bottom:.3rem;font-size:.92rem}
+.doc-section li strong,.doc-section p strong{color:var(--white)}
+
+/* code block */
+.code-block{
+  background:#0a0e14;border:1px solid var(--border);border-radius:6px;
+  overflow:hidden;margin:1.25rem 0;
+}
+.code-header{
+  background:#111827;padding:.6rem 1rem;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid var(--border);
+}
+.code-lang{font-family:var(--font-mono);font-size:.7rem;color:var(--dim2);letter-spacing:.1em;text-transform:uppercase}
+.code-copy{
+  font-family:var(--font-mono);font-size:.7rem;color:var(--dim2);
+  background:none;border:none;cursor:pointer;transition:color .2s;padding:.1rem .3rem;
+}
+.code-copy:hover{color:var(--cyan)}
+pre{padding:1.25rem 1.5rem;overflow-x:auto;font-family:var(--font-mono);font-size:.82rem;line-height:1.75}
+pre::-webkit-scrollbar{height:4px}
+pre::-webkit-scrollbar-track{background:transparent}
+pre::-webkit-scrollbar-thumb{background:var(--border)}
+
+/* inline code */
+code:not(pre code){
+  font-family:var(--font-mono);font-size:.82em;
+  background:rgba(0,229,255,.08);color:var(--cyan);
+  padding:.1em .4em;border-radius:3px;
+}
+
+/* table */
+.doc-table{width:100%;border-collapse:collapse;margin:1.25rem 0;font-size:.85rem}
+.doc-table th{
+  font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--dim2);padding:.6rem 1rem;border-bottom:1px solid var(--border);text-align:left;
+}
+.doc-table td{
+  padding:.65rem 1rem;border-bottom:1px solid #111827;color:var(--dim);vertical-align:top;
+}
+.doc-table tr:last-child td{border-bottom:none}
+.doc-table td:first-child{font-family:var(--font-mono);font-size:.8rem;color:var(--cyan)}
+
+/* badge */
+.badge{
+  display:inline-block;font-family:var(--font-mono);font-size:.7rem;
+  padding:.2rem .6rem;border-radius:3px;
+  border:1px solid;margin-left:.5rem;vertical-align:middle;
+}
+.badge-new{color:var(--green);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.05)}
+.badge-mw{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.05)}
+
+/* ── PERF ── */
+#performance{background:var(--bg2)}
+.perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.perf-bar-group{margin-bottom:2.5rem}
+.perf-bar-label{font-family:var(--font-mono);font-size:.78rem;color:var(--dim);margin-bottom:.5rem;display:flex;justify-content:space-between}
+.perf-bar-label span{color:var(--white);font-weight:600}
+.perf-track{background:var(--border);border-radius:2px;height:8px;overflow:hidden}
+.perf-fill{height:100%;border-radius:2px;transition:width 1.2s cubic-bezier(.16,1,.3,1)}
+.perf-fill-cyan{background:linear-gradient(90deg,var(--cyan-dim),var(--cyan))}
+.perf-fill-dim{background:var(--dim2)}
+.perf-note{font-size:.8rem;color:var(--dim2);margin-top:2rem;font-style:italic}
+
+.perf-callouts{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.callout{
+  border:1px solid var(--border);border-radius:6px;padding:1.5rem;background:var(--card);
+}
+.callout-num{font-family:var(--font-mono);font-size:2.2rem;font-weight:700;color:var(--cyan);line-height:1}
+.callout-desc{font-size:.82rem;color:var(--dim);margin-top:.4rem}
+
+/* ── MIDDLEWARE SHOWCASE ── */
+.mw-tabs{display:flex;gap:0;margin-bottom:0;border:1px solid var(--border);border-radius:6px 6px 0 0;overflow:hidden}
+.mw-tab{
+  font-family:var(--font-mono);font-size:.78rem;padding:.6rem 1.2rem;
+  background:var(--card);color:var(--dim);border:none;cursor:pointer;
+  border-right:1px solid var(--border);transition:all .2s;flex:1;
+}
+.mw-tab:last-child{border-right:none}
+.mw-tab.active,.mw-tab:hover{background:#161d2c;color:var(--cyan)}
+.mw-panel{display:none}
+.mw-panel.active{display:block}
+.mw-panel .code-block{border-radius:0 0 6px 6px;border-top:none;margin:0}
+
+/* ── FOOTER ── */
+footer{
+  border-top:1px solid var(--border);padding:3rem 0;
+  background:var(--bg);
+}
+.footer-inner{display:flex;align-items:center;justify-content:space-between}
+.footer-logo{font-family:var(--font-mono);font-size:1rem;font-weight:700;color:var(--cyan)}
+.footer-links{display:flex;gap:2rem;list-style:none}
+.footer-links a{font-family:var(--font-mono);font-size:.78rem;color:var(--dim);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--cyan)}
+.footer-copy{font-size:.78rem;color:var(--dim2)}
+
+/* ── SYNTAX COLOURS (used in static code blocks) ── */
+.kw{color:#BD93F9}
+.fn{color:#00E5FF}
+.str{color:#FFD600}
+.cm{color:#4A5568}
+.tp{color:#FFB86C}
+.pk{color:#39FF14}
+.nm{color:#FF79C6}
+.op{color:#8899AA}
+
+/* ── ANIMATIONS ── */
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.visible{opacity:1;transform:none}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .docs-layout{grid-template-columns:1fr}
+  .docs-sidebar{display:none}
+  .docs-content{padding:2rem 1.5rem}
+  .perf-grid{grid-template-columns:1fr}
+  h1{font-size:2.5rem}
+  .nav-links{display:none}
+}
+@media(max-width:600px){
+  .features-grid{grid-template-columns:1fr}
+  .perf-callouts{grid-template-columns:1fr}
+  .hero-stats{flex-wrap:wrap;gap:1.5rem}
+  .footer-inner{flex-direction:column;gap:1.5rem;text-align:center}
+  .mw-tabs{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#">breeze<span>.go</span></a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#performance">Performance</a></li>
+    <li><a href="#docs">Docs</a></li>
+    <li><a href="#middlewares-section">Middlewares</a></li>
+  </ul>
+  <a class="nav-cta" href="https://github.com/nelthaarion/breeze" target="_blank">GitHub →</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">Go HTTP Framework</div>
+        <h1>Built for<br/><em>raw speed.</em><br/>Shipped clean.</h1>
+        <p class="hero-sub">
+          Breeze is an event-driven HTTP framework for Go built on gnet.
+          Zero-allocation hot paths, a composable middleware chain, and
+          built-in Swagger docs — out of the box.
+        </p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="#docs">Get Started</a>
+          <a class="btn-ghost" href="https://github.com/nelthaarion/breeze" target="_blank">View on GitHub</a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="stat-val">3×</div>
+            <div class="stat-lbl">Faster than goFiber</div>
+          </div>
+          <div>
+            <div class="stat-val">~0</div>
+            <div class="stat-lbl">Allocs in hot path</div>
+          </div>
+          <div>
+            <div class="stat-val">9</div>
+            <div class="stat-lbl">Built-in middlewares</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="terminal">
+          <div class="terminal-bar">
+            <div class="dot dot-r"></div>
+            <div class="dot dot-y"></div>
+            <div class="dot dot-g"></div>
+            <span class="terminal-file">main.go</span>
+          </div>
+          <div class="terminal-body" id="terminal-output"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <span class="section-label">Why Breeze</span>
+    <h2 class="section-title">Every decision made<br/>for performance.</h2>
+    <p class="section-desc">Not another wrapper around net/http. Breeze is built from the ground up on a non-blocking event loop with an obsession over allocations.</p>
+    <div class="features-grid">
+      <div class="feat-card fade-up">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">gnet Event Loop</div>
+        <div class="feat-desc">Non-blocking I/O with one event-loop goroutine per CPU core. RoundRobin load balancing across reactors. No goroutine-per-connection.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🔀</div>
+        <div class="feat-title">Zero-Alloc Router</div>
+        <div class="feat-desc">Path segment matching uses a stack-allocated <code>[16]string</code>. Param indexes are pre-computed at registration. The hot loop never allocates on a miss.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🧠</div>
+        <div class="feat-title">Zero-Copy Parsing</div>
+        <div class="feat-desc"><code>unsafe.String</code> converts raw bytes to strings without copying. Header keys are lowercased in-place. No <code>bytes.Split</code> — just indexed scans.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🔧</div>
+        <div class="feat-title">Worker Pool</div>
+        <div class="feat-desc">Fixed goroutine pool with 16× buffered channel absorbs bursts. Queue-full fallback spawns a goroutine rather than blocking the event loop.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">📄</div>
+        <div class="feat-title">OpenAPI 3.1 Built-In</div>
+        <div class="feat-desc">Annotate routes with Go structs. Breeze reflects types at startup to generate a live Swagger spec. No YAML. No codegen. Just <code>/swagger</code>.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🛡️</div>
+        <div class="feat-title">9 Middleware Suite</div>
+        <div class="feat-desc">JWT auth with refresh tokens, rate limiting, compression (Brotli/Gzip/Deflate), ETag cache, CORS, security headers, logger, panic recovery.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">📁</div>
+        <div class="feat-title">File Uploads</div>
+        <div class="feat-desc">Multipart form parsing with size limits and content-type sniffing built into <code>Context</code>. One-line save-to-disk API. No stdlib <code>http.Request</code> required.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🗂️</div>
+        <div class="feat-title">Static File Serving</div>
+        <div class="feat-desc">Register a directory with one line. Directory traversal sanitized via <code>filepath.Clean</code>. MIME type from extension with fallback to content sniffing.</div>
+      </div>
+      <div class="feat-card fade-up">
+        <div class="feat-icon">🔒</div>
+        <div class="feat-title">Copy-On-Write Headers</div>
+        <div class="feat-desc">Shared package-level header maps for JSON/HTML/text responses. <code>SetHeader</code> upgrades to a private copy lazily — zero allocation unless you mutate.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section id="performance">
+  <div class="container">
+    <span class="section-label">Benchmarks</span>
+    <h2 class="section-title">3× faster.<br/>Not a typo.</h2>
+    <p class="section-desc">Measured on a simple JSON endpoint, same machine, same payload. The gap widens further under pipelining and high concurrency.</p>
+    <div class="perf-grid">
+      <div>
+        <div class="perf-bar-group fade-up">
+          <div class="perf-bar-label">Breeze <span>~630k req/s</span></div>
+          <div class="perf-track"><div class="perf-fill perf-fill-cyan" style="width:0" data-w="100%"></div></div>
+        </div>
+        <div class="perf-bar-group fade-up">
+          <div class="perf-bar-label">Fiber <span>~210k req/s</span></div>
+          <div class="perf-track"><div class="perf-fill perf-fill-dim" style="width:0" data-w="65%"></div></div>
+        </div>
+        <div class="perf-bar-group fade-up">
+          <div class="perf-bar-label">Echo <span>~140k req/s</span></div>
+          <div class="perf-track"><div class="perf-fill perf-fill-dim" style="width:0" data-w="44%"></div></div>
+        </div>
+        <div class="perf-bar-group fade-up">
+          <div class="perf-bar-label">Gin <span>~120k req/s</span></div>
+          <div class="perf-track"><div class="perf-fill perf-fill-dim" style="width:0" data-w="41%"></div></div>
+        </div>
+        <div class="perf-bar-group fade-up">
+          <div class="perf-bar-label">net/http <span>~85k req/s</span></div>
+          <div class="perf-track"><div class="perf-fill perf-fill-dim" style="width:0" data-w="33%"></div></div>
+        </div>
+        <p class="perf-note">* Approximate. Run benchmarks in your environment for authoritative numbers.</p>
+      </div>
+      <div class="perf-callouts">
+        <div class="callout fade-up">
+          <div class="callout-num">3×</div>
+          <div class="callout-desc">Throughput vs std goFiber on plaintext endpoints</div>
+        </div>
+        <div class="callout fade-up">
+          <div class="callout-num">~0</div>
+          <div class="callout-desc">Heap allocs per request on static routes</div>
+        </div>
+        <div class="callout fade-up">
+          <div class="callout-num">16×</div>
+          <div class="callout-desc">Worker pool channel buffer — never stalls the event loop</div>
+        </div>
+        <div class="callout fade-up">
+          <div class="callout-num">512B</div>
+          <div class="callout-desc">Compact threshold — GC can reclaim large receive buffers</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MIDDLEWARES SECTION -->
+<section id="middlewares-section">
+  <div class="container">
+    <span class="section-label">Middleware</span>
+    <h2 class="section-title">Production-ready.<br/>Day one.</h2>
+    <p class="section-desc">Every middleware is a <code>HandlerFunc</code> — composable, testable, and zero-dependency on each other.</p>
+
+    <div class="mw-tabs">
+      <button class="mw-tab active" onclick="switchTab(this,'tab-jwt')">JWT Auth</button>
+      <button class="mw-tab" onclick="switchTab(this,'tab-cors')">CORS</button>
+      <button class="mw-tab" onclick="switchTab(this,'tab-rate')">Rate Limit</button>
+      <button class="mw-tab" onclick="switchTab(this,'tab-compress')">Compression</button>
+      <button class="mw-tab" onclick="switchTab(this,'tab-helmet')">Helmet</button>
+      <button class="mw-tab" onclick="switchTab(this,'tab-swagger')">Swagger</button>
+    </div>
+
+    <div id="tab-jwt" class="mw-panel active">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="kw">import</span> (
+    <span class="str">"github.com/golang-jwt/jwt/v5"</span>
+    middleware <span class="str">"github.com/nelthaarion/breeze/middlewares"</span>
+)
+
+<span class="cm">// Generate tokens</span>
+accessToken, _ := middleware.<span class="fn">GenerateJWT</span>(
+    <span class="str">"secret"</span>, jwt.MapClaims{<span class="str">"user_id"</span>: <span class="str">"abc"</span>, <span class="str">"role"</span>: <span class="str">"admin"</span>},
+    <span class="nm">15</span>*time.Minute, <span class="kw">nil</span>,
+)
+refreshToken, _ := middleware.<span class="fn">GenerateRefreshToken</span>(<span class="str">"refresh-secret"</span>, jwt.MapClaims{
+    <span class="str">"user_id"</span>: <span class="str">"abc"</span>,
+}, <span class="nm">7</span>*<span class="nm">24</span>*time.Hour, <span class="kw">nil</span>)
+
+<span class="cm">// Apply middleware</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">JWTAuthMiddleware</span>(middleware.JWTOptions{
+    AccessSecret:       <span class="str">"secret"</span>,
+    RefreshSecret:      <span class="str">"refresh-secret"</span>,
+    SigningMethod:      jwt.SigningMethodHS256,
+    EnableRefreshToken: <span class="kw">true</span>,         <span class="cm">// auto-rotate expired access tokens</span>
+    RequiredRoles:      []<span class="tp">string</span>{<span class="str">"admin"</span>},
+    UserContextKey:     <span class="str">"user"</span>,        <span class="cm">// stored in ctx.Param("user")</span>
+    ClaimsValidator: <span class="kw">func</span>(claims jwt.MapClaims) <span class="tp">bool</span> {
+        <span class="kw">return</span> claims[<span class="str">"active"</span>] == <span class="kw">true</span>
+    },
+    OnUnauthorized: <span class="kw">func</span>(ctx *breeze.Context, err <span class="tp">error</span>) {
+        ctx.<span class="fn">Status</span>(<span class="nm">401</span>)
+        ctx.<span class="fn">JSON</span>(map[<span class="tp">string</span>]<span class="tp">string</span>{<span class="str">"error"</span>: err.<span class="fn">Error</span>()})
+    },
+}))</pre>
+      </div>
+    </div>
+
+    <div id="tab-cors" class="mw-panel">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+        <pre>router.<span class="fn">Use</span>(middleware.<span class="fn">CORSMiddleware</span>(middleware.CORSOptions{
+    AllowOrigins:     <span class="str">"https://myapp.com"</span>,
+    AllowMethods:     <span class="str">"GET,POST,PUT,DELETE,OPTIONS"</span>,
+    AllowHeaders:     <span class="str">"Content-Type,Authorization"</span>,
+    AllowCredentials: <span class="str">"true"</span>,
+    MaxAge:           <span class="str">"86400"</span>,  <span class="cm">// preflight cache: 24h</span>
+}))
+
+<span class="cm">// OPTIONS preflight is handled automatically → 204 No Content</span></pre>
+      </div>
+    </div>
+
+    <div id="tab-rate" class="mw-panel">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm">// 100 requests per minute per IP</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">NewRateLimiter</span>(middleware.RateLimiterOptions{
+    Requests: <span class="nm">100</span>,
+    Per:      time.Minute,
+    Message:  <span class="str">"Slow down — rate limit exceeded"</span>,
+}))
+
+<span class="cm">// Different limits per route</span>
+router.<span class="fn">Handle</span>(breeze.POST, <span class="str">"/login"</span>, loginHandler,
+    middleware.<span class="fn">NewRateLimiter</span>(middleware.RateLimiterOptions{
+        Requests: <span class="nm">5</span>,
+        Per:      time.Minute,
+    }),
+)
+<span class="cm">// Returns 429 Too Many Requests when exceeded</span></pre>
+      </div>
+    </div>
+
+    <div id="tab-compress" class="mw-panel">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm">// Automatically picks best encoding from Accept-Encoding header</span>
+<span class="cm">// Priority: br (Brotli) → gzip → deflate → none</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">CompressionMiddleware</span>())
+
+<span class="cm">// Sets Content-Encoding response header automatically:
+//   br       → github.com/andybalholm/brotli
+//   gzip     → compress/gzip (stdlib)
+//   deflate  → compress/flate (stdlib)</span></pre>
+      </div>
+    </div>
+
+    <div id="tab-helmet" class="mw-panel">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm">// Safe defaults in one line</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">DefaultSecurityMiddleware</span>())
+
+<span class="cm">// Or fully custom</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">SecurityMiddleware</span>(middleware.SecurityOptions{
+    ContentSecurityPolicy:     <span class="str">"default-src 'self'"</span>,
+    XFrameOptions:             <span class="str">"DENY"</span>,
+    XContentTypeOptions:       <span class="str">"nosniff"</span>,
+    StrictTransportSecurity:   <span class="str">"max-age=63072000; includeSubDomains; preload"</span>,
+    ReferrerPolicy:            <span class="str">"no-referrer"</span>,
+    XXSSProtection:            <span class="str">"1; mode=block"</span>,
+    CrossOriginEmbedderPolicy: <span class="str">"require-corp"</span>,
+    CrossOriginOpenerPolicy:   <span class="str">"same-origin"</span>,
+    CacheControl:              <span class="str">"no-store, no-cache, must-revalidate"</span>,
+}))</pre>
+      </div>
+    </div>
+
+    <div id="tab-swagger" class="mw-panel">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm">// 1. Enable Swagger (before routes)</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">SwaggerMiddleware</span>(router, middleware.SwaggerOptions{
+    Title:    <span class="str">"My API"</span>,
+    Version:  <span class="str">"1.0.0"</span>,
+    JSONPath: <span class="str">"/swagger.json"</span>,
+    UIPath:   <span class="str">"/swagger"</span>,
+}))
+
+<span class="cm">// 2. Annotate routes with Go structs — no YAML, no codegen</span>
+router.<span class="fn">Handle</span>(breeze.POST, <span class="str">"/users"</span>, createUser,
+    middleware.<span class="fn">DocPOST</span>(<span class="str">"/users"</span>, swagger.RouteDoc{
+        Title: <span class="str">"Create user"</span>,
+        Tags:  []<span class="tp">string</span>{<span class="str">"Users"</span>},
+        Input: []swagger.InputGroup{
+            {Type: swagger.InputBody, Fields: CreateUserRequest{}, Required: <span class="kw">true</span>},
+        },
+        Output:       UserResponse{},
+        OutputStatus: <span class="nm">201</span>,
+    }),
+)
+
+<span class="cm">// Visit /swagger → live Swagger UI
+// Visit /swagger.json → raw OpenAPI 3.1 JSON</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FULL DOCS -->
+<section id="docs" style="padding:0;background:var(--bg2)">
+  <div class="docs-layout">
+    <!-- sidebar -->
+    <nav class="docs-sidebar">
+      <div class="sidebar-section">
+        <span class="sidebar-head">Getting Started</span>
+        <ul class="sidebar-links">
+          <li><a href="#doc-install" class="active">Installation</a></li>
+          <li><a href="#doc-quickstart">Quick Start</a></li>
+          <li><a href="#doc-server">Server Config</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-head">Core</span>
+        <ul class="sidebar-links">
+          <li><a href="#doc-router">Router</a></li>
+          <li><a href="#doc-context">Context</a></li>
+          <li><a href="#doc-request">Request</a></li>
+          <li><a href="#doc-response">Response</a></li>
+          <li><a href="#doc-params">Params &amp; Query</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-head">Middleware</span>
+        <ul class="sidebar-links">
+          <li><a href="#doc-mw-logger">Logger</a></li>
+          <li><a href="#doc-mw-recovery">Panic Recovery</a></li>
+          <li><a href="#doc-mw-cors">CORS</a></li>
+          <li><a href="#doc-mw-helmet">Helmet</a></li>
+          <li><a href="#doc-mw-jwt">JWT Auth</a></li>
+          <li><a href="#doc-mw-rate">Rate Limiter</a></li>
+          <li><a href="#doc-mw-etag">ETag Cache</a></li>
+          <li><a href="#doc-mw-compress">Compression</a></li>
+          <li><a href="#doc-mw-swagger">Swagger</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-head">Advanced</span>
+        <ul class="sidebar-links">
+          <li><a href="#doc-upload">File Uploads</a></li>
+          <li><a href="#doc-static">Static Files</a></li>
+          <li><a href="#doc-pool">Worker Pool</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- content -->
+    <div class="docs-content">
+
+      <!-- INSTALL -->
+      <div class="doc-section" id="doc-install">
+        <h2>Installation</h2>
+        <p>Requires Go 1.24.3 or later.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">shell</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre>go get github.com/nelthaarion/breeze</pre>
+        </div>
+        <p>The module pulls in <strong>gnet v2</strong> for the event loop, <strong>go-json</strong> for fast JSON marshaling, <strong>brotli</strong> for compression, and <strong>golang-jwt/jwt</strong> for authentication. No transitive surprises.</p>
+      </div>
+
+      <!-- QUICK START -->
+      <div class="doc-section" id="doc-quickstart">
+        <h2>Quick Start</h2>
+        <p>A complete working server in under 20 lines.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="kw">package</span> <span class="pk">main</span>
+
+<span class="kw">import</span> (
+    <span class="str">"runtime"</span>
+    <span class="str">"github.com/nelthaarion/breeze"</span>
+    middleware <span class="str">"github.com/nelthaarion/breeze/middlewares"</span>
+)
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    router := breeze.<span class="fn">NewRouter</span>()
+
+    router.<span class="fn">Use</span>(middleware.<span class="fn">RecoveryMiddleware</span>())
+    router.<span class="fn">Use</span>(middleware.<span class="fn">LoggingMiddleware</span>())
+
+    router.<span class="fn">Handle</span>(breeze.GET, <span class="str">"/"</span>, <span class="kw">func</span>(ctx *breeze.Context) {
+        ctx.<span class="fn">JSON</span>(map[<span class="tp">string</span>]<span class="tp">string</span>{<span class="str">"status"</span>: <span class="str">"ok"</span>})
+    })
+
+    router.<span class="fn">Handle</span>(breeze.GET, <span class="str">"/users/:id"</span>, <span class="kw">func</span>(ctx *breeze.Context) {
+        ctx.<span class="fn">JSON</span>(map[<span class="tp">string</span>]<span class="tp">string</span>{<span class="str">"id"</span>: ctx.<span class="fn">Param</span>(<span class="str">"id"</span>)})
+    })
+
+    pool := breeze.<span class="fn">NewWorkerPool</span>(runtime.<span class="fn">NumCPU</span>())
+    app  := breeze.<span class="fn">New</span>(router, pool)
+    app.<span class="fn">Run</span>(<span class="nm">3000</span>, <span class="kw">true</span>)  <span class="cm">// port, multiCore</span>
+}</pre>
+        </div>
+      </div>
+
+      <!-- SERVER CONFIG -->
+      <div class="doc-section" id="doc-server">
+        <h2>Server Config</h2>
+        <p><code>app.Run(port, multiCore)</code> starts the gnet event loop with sensible defaults baked in.</p>
+        <table class="doc-table">
+          <tr><th>Option</th><th>Value</th><th>Effect</th></tr>
+          <tr><td>TCPNoDelay</td><td>enabled</td><td>Disables Nagle's algorithm — lower latency for small messages</td></tr>
+          <tr><td>Multicore</td><td>configurable</td><td>Spawns one event-loop per CPU core when <code>true</code></td></tr>
+          <tr><td>LoadBalancing</td><td>RoundRobin</td><td>Distributes connections evenly across event loops</td></tr>
+        </table>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre>app.<span class="fn">Run</span>(<span class="nm">8080</span>, <span class="kw">true</span>)   <span class="cm">// multicore — one loop per CPU, recommended</span>
+app.<span class="fn">Run</span>(<span class="nm">8080</span>, <span class="kw">false</span>)  <span class="cm">// single-core — useful for dev / debugging</span></pre>
+        </div>
+      </div>
+
+      <!-- ROUTER -->
+      <div class="doc-section" id="doc-router">
+        <h2>Router</h2>
+        <p>Create a router, register global middleware, then define routes. Routes support static segments, named parameters, and wildcards.</p>
+        <h3>Methods</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre>router := breeze.<span class="fn">NewRouter</span>()
+
+<span class="cm">// Global middleware (runs on every route)</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">LoggingMiddleware</span>())
+
+<span class="cm">// Static segment</span>
+router.<span class="fn">Handle</span>(breeze.GET,    <span class="str">"/health"</span>,        healthHandler)
+
+<span class="cm">// Named parameter — :id available via ctx.Param("id")</span>
+router.<span class="fn">Handle</span>(breeze.GET,    <span class="str">"/users/:id"</span>,     getUser)
+router.<span class="fn">Handle</span>(breeze.POST,   <span class="str">"/users"</span>,         createUser)
+router.<span class="fn">Handle</span>(breeze.PUT,    <span class="str">"/users/:id"</span>,     updateUser)
+router.<span class="fn">Handle</span>(breeze.DELETE, <span class="str">"/users/:id"</span>,     deleteUser)
+
+<span class="cm">// Wildcard — *filepath captures everything after /files/</span>
+router.<span class="fn">Handle</span>(breeze.GET, <span class="str">"/files/*filepath"</span>, fileHandler)
+
+<span class="cm">// Per-route middleware (runs only on this route)</span>
+router.<span class="fn">Handle</span>(breeze.POST, <span class="str">"/admin/action"</span>, adminHandler,
+    authMiddleware, auditMiddleware,
+)</pre>
+        </div>
+        <h3>Route Matching Priority</h3>
+        <p>Routes are matched in registration order. A static segment always beats a named parameter when both could match — register more specific routes first.</p>
+        <table class="doc-table">
+          <tr><th>Pattern</th><th>Matches</th><th>Params</th></tr>
+          <tr><td>/users</td><td>/users</td><td>—</td></tr>
+          <tr><td>/users/:id</td><td>/users/abc</td><td>id=abc</td></tr>
+          <tr><td>/users/:id/posts</td><td>/users/abc/posts</td><td>id=abc</td></tr>
+          <tr><td>/files/*path</td><td>/files/a/b/c.txt</td><td>path=a/b/c.txt</td></tr>
+        </table>
+      </div>
+
+      <!-- CONTEXT -->
+      <div class="doc-section" id="doc-context">
+        <h2>Context</h2>
+        <p>Every handler receives a <code>*breeze.Context</code>. It carries the connection, parsed request, response, route params, and controls the middleware chain.</p>
+        <h3>Response Helpers</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// JSON — sets Content-Type: application/json, status 200</span>
+ctx.<span class="fn">JSON</span>(map[<span class="tp">string</span>]<span class="tp">any</span>{<span class="str">"id"</span>: <span class="nm">1</span>, <span class="str">"name"</span>: <span class="str">"Alice"</span>})
+
+<span class="cm">// Plain text</span>
+ctx.<span class="fn">WriteString</span>(<span class="str">"Hello, World!"</span>)
+
+<span class="cm">// HTML</span>
+ctx.<span class="fn">HTML</span>([]<span class="tp">byte</span>(<span class="str">"&lt;h1&gt;Hello&lt;/h1&gt;"</span>))
+
+<span class="cm">// Override status code</span>
+ctx.<span class="fn">Status</span>(<span class="nm">201</span>)  <span class="cm">// call after JSON/WriteString/HTML</span>
+
+<span class="cm">// Add/override a header</span>
+ctx.<span class="fn">SetHeader</span>(<span class="str">"X-Request-Id"</span>, <span class="str">"uuid-123"</span>)</pre>
+        </div>
+        <h3>Middleware Chain</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Advance to the next handler in the chain</span>
+ctx.<span class="fn">Next</span>()
+
+<span class="cm">// Short-circuit — skip all remaining handlers</span>
+ctx.<span class="fn">Abort</span>()
+
+<span class="cm">// Typical middleware pattern</span>
+<span class="kw">func</span> <span class="fn">AuthMiddleware</span>(ctx *breeze.Context) {
+    token := ctx.Req.Header[<span class="str">"authorization"</span>]
+    <span class="kw">if</span> token == <span class="str">""</span> {
+        ctx.<span class="fn">Status</span>(<span class="nm">401</span>)
+        ctx.<span class="fn">WriteString</span>(<span class="str">"Unauthorized"</span>)
+        ctx.<span class="fn">Abort</span>()  <span class="cm">// ← stops the chain here</span>
+        <span class="kw">return</span>
+    }
+    ctx.<span class="fn">Next</span>()  <span class="cm">// ← continue to next handler</span>
+}</pre>
+        </div>
+      </div>
+
+      <!-- REQUEST -->
+      <div class="doc-section" id="doc-request">
+        <h2>Request</h2>
+        <p><code>ctx.Req</code> is a <code>*breeze.HTTPRequest</code> parsed from raw bytes with zero unnecessary allocations.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Method, Path, Headers</span>
+method := ctx.Req.Method          <span class="cm">// breeze.Method ("GET", "POST", …)</span>
+path   := ctx.Req.Path            <span class="cm">// "/users/123"</span>
+ct     := ctx.Req.Header[<span class="str">"content-type"</span>]  <span class="cm">// headers are lowercased</span>
+
+<span class="cm">// Body</span>
+<span class="kw">var</span> payload CreateUserRequest
+json.<span class="fn">Unmarshal</span>(ctx.Req.Body, &amp;payload)
+
+<span class="cm">// Query string</span>
+page  := ctx.<span class="fn">Query</span>(<span class="str">"page"</span>)   <span class="cm">// "2"</span>
+limit := ctx.<span class="fn">Query</span>(<span class="str">"limit"</span>)  <span class="cm">// "20"</span></pre>
+        </div>
+      </div>
+
+      <!-- RESPONSE -->
+      <div class="doc-section" id="doc-response">
+        <h2>Response</h2>
+        <p><code>ctx.Res</code> is a <code>*breeze.HTTPResponse</code>. Breeze serializes it to raw HTTP/1.1 bytes using <code>strconv.AppendInt</code> — no <code>fmt.Sprintf</code>, pre-sized buffer, array-indexed status text.</p>
+        <table class="doc-table">
+          <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+          <tr><td>Status</td><td>int</td><td>HTTP status code (200, 404, …)</td></tr>
+          <tr><td>Headers</td><td>map[string]string</td><td>Copy-on-write — safe to mutate via SetHeader</td></tr>
+          <tr><td>Body</td><td>[]byte</td><td>Raw response body</td></tr>
+        </table>
+        <p>You rarely set <code>ctx.Res</code> directly — use the helpers (<code>JSON</code>, <code>WriteString</code>, <code>HTML</code>, <code>Status</code>, <code>SetHeader</code>) instead.</p>
+      </div>
+
+      <!-- PARAMS -->
+      <div class="doc-section" id="doc-params">
+        <h2>Params &amp; Query</h2>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Route: /users/:id/posts/:postId</span>
+userID := ctx.<span class="fn">Param</span>(<span class="str">"id"</span>)         <span class="cm">// "abc"</span>
+postID := ctx.<span class="fn">Param</span>(<span class="str">"postId"</span>)     <span class="cm">// "42"</span>
+
+<span class="cm">// Query: /search?q=go&amp;page=2</span>
+q    := ctx.<span class="fn">Query</span>(<span class="str">"q"</span>)            <span class="cm">// "go"</span>
+page := ctx.<span class="fn">Query</span>(<span class="str">"page"</span>)        <span class="cm">// "2"</span>
+
+<span class="cm">// Middleware can pass data downstream via params</span>
+ctx.<span class="fn">SetParam</span>(<span class="str">"userID"</span>, <span class="str">"from-auth"</span>)
+<span class="cm">// in handler:</span>
+uid := ctx.<span class="fn">GetParam</span>(<span class="str">"userID"</span>)   <span class="cm">// "from-auth"</span>
+
+<span class="cm">// Get a snapshot of all params</span>
+all := ctx.<span class="fn">GetParams</span>()           <span class="cm">// map[string]string (copy)</span></pre>
+        </div>
+      </div>
+
+      <!-- MW: LOGGER -->
+      <div class="doc-section" id="doc-mw-logger">
+        <h2>Logger <span class="badge badge-mw">middleware</span></h2>
+        <p>Logs method, path, status, and elapsed time for every request. Output goes to stdout in RFC3339 format.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre>router.<span class="fn">Use</span>(middleware.<span class="fn">LoggingMiddleware</span>())
+<span class="cm">// Output: [Breeze][2026-06-23T12:00:00Z] GET /users -> 200 (1.2ms)</span></pre>
+        </div>
+      </div>
+
+      <!-- MW: RECOVERY -->
+      <div class="doc-section" id="doc-mw-recovery">
+        <h2>Panic Recovery <span class="badge badge-mw">middleware</span></h2>
+        <p>Wraps the entire handler chain in a <code>defer/recover</code>. On panic: logs the value + full stack trace, sets 500, calls <code>ctx.Abort()</code>. Your server never crashes from a handler bug.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre>router.<span class="fn">Use</span>(middleware.<span class="fn">RecoveryMiddleware</span>())
+<span class="cm">// Register first so it wraps everything else</span></pre>
+        </div>
+      </div>
+
+      <!-- MW: CORS -->
+      <div class="doc-section" id="doc-mw-cors">
+        <h2>CORS <span class="badge badge-mw">middleware</span></h2>
+        <p>Sets <code>Access-Control-*</code> headers and handles <code>OPTIONS</code> preflight automatically.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre>router.<span class="fn">Use</span>(middleware.<span class="fn">CORSMiddleware</span>(middleware.CORSOptions{
+    AllowOrigins:     <span class="str">"*"</span>,
+    AllowMethods:     <span class="str">"GET,POST,PUT,DELETE"</span>,
+    AllowHeaders:     <span class="str">"Content-Type,Authorization"</span>,
+    ExposeHeaders:    <span class="str">"X-Request-Id"</span>,
+    AllowCredentials: <span class="str">"true"</span>,
+    MaxAge:           <span class="str">"86400"</span>,
+}))</pre>
+        </div>
+      </div>
+
+      <!-- MW: HELMET -->
+      <div class="doc-section" id="doc-mw-helmet">
+        <h2>Helmet <span class="badge badge-mw">middleware</span></h2>
+        <p>Sets 12 security-hardening HTTP headers. Use the opinionated defaults or configure each header individually.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// One-liner safe defaults</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">DefaultSecurityMiddleware</span>())
+
+<span class="cm">// Custom</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">SecurityMiddleware</span>(middleware.SecurityOptions{
+    ContentSecurityPolicy:   <span class="str">"default-src 'self'; img-src *"</span>,
+    XFrameOptions:           <span class="str">"SAMEORIGIN"</span>,
+    StrictTransportSecurity: <span class="str">"max-age=31536000"</span>,
+}))</pre>
+        </div>
+        <table class="doc-table">
+          <tr><th>Header</th><th>Default</th></tr>
+          <tr><td>Content-Security-Policy</td><td>default-src 'self'</td></tr>
+          <tr><td>X-Frame-Options</td><td>DENY</td></tr>
+          <tr><td>X-Content-Type-Options</td><td>nosniff</td></tr>
+          <tr><td>Strict-Transport-Security</td><td>max-age=63072000; includeSubDomains; preload</td></tr>
+          <tr><td>X-XSS-Protection</td><td>1; mode=block</td></tr>
+          <tr><td>Referrer-Policy</td><td>no-referrer</td></tr>
+          <tr><td>Cache-Control</td><td>no-store, no-cache, must-revalidate</td></tr>
+        </table>
+      </div>
+
+      <!-- MW: JWT -->
+      <div class="doc-section" id="doc-mw-jwt">
+        <h2>JWT Auth <span class="badge badge-mw">middleware</span></h2>
+        <p>Full JWT authentication with optional refresh token rotation, RBAC, and custom claims validation. Tokens are looked up from the <code>Authorization: Bearer</code> header by default.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Generate</span>
+token, _   := middleware.<span class="fn">GenerateJWT</span>(<span class="str">"secret"</span>, jwt.MapClaims{
+    <span class="str">"user_id"</span>: <span class="str">"u-123"</span>, <span class="str">"role"</span>: <span class="str">"admin"</span>,
+}, <span class="nm">15</span>*time.Minute, <span class="kw">nil</span>)
+
+refresh, _ := middleware.<span class="fn">GenerateRefreshToken</span>(<span class="str">"refresh-secret"</span>,
+    jwt.MapClaims{<span class="str">"user_id"</span>: <span class="str">"u-123"</span>}, <span class="nm">7</span>*<span class="nm">24</span>*time.Hour, <span class="kw">nil</span>)
+
+<span class="cm">// Validate</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">JWTAuthMiddleware</span>(middleware.JWTOptions{
+    AccessSecret:       <span class="str">"secret"</span>,
+    RefreshSecret:      <span class="str">"refresh-secret"</span>,
+    EnableRefreshToken: <span class="kw">true</span>,  <span class="cm">// new token returned in X-New-Access-Token</span>
+    RequiredRoles:      []<span class="tp">string</span>{<span class="str">"admin"</span>, <span class="str">"editor"</span>},
+    UserContextKey:     <span class="str">"user"</span>,
+}))</pre>
+        </div>
+        <h3>Custom Token Extraction</h3>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Read from cookie instead of header</span>
+TokenLookup: <span class="kw">func</span>(ctx *breeze.Context) (<span class="tp">string</span>, <span class="tp">string</span>, <span class="tp">error</span>) {
+    access  := ctx.Req.Header[<span class="str">"x-access-token"</span>]
+    refresh := ctx.Req.Header[<span class="str">"x-refresh-token"</span>]
+    <span class="kw">if</span> access == <span class="str">""</span> {
+        <span class="kw">return</span> <span class="str">""</span>, <span class="str">""</span>, fmt.<span class="fn">Errorf</span>(<span class="str">"token missing"</span>)
+    }
+    <span class="kw">return</span> access, refresh, <span class="kw">nil</span>
+},</pre>
+        </div>
+      </div>
+
+      <!-- MW: RATE -->
+      <div class="doc-section" id="doc-mw-rate">
+        <h2>Rate Limiter <span class="badge badge-mw">middleware</span></h2>
+        <p>In-memory token counter per remote IP. Resets after each <code>Per</code> window. Returns <code>429 Too Many Requests</code> with a configurable message.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Global limit</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">NewRateLimiter</span>(middleware.RateLimiterOptions{
+    Requests: <span class="nm">100</span>,
+    Per:      time.Minute,
+}))
+
+<span class="cm">// Strict limit on a specific route</span>
+router.<span class="fn">Handle</span>(breeze.POST, <span class="str">"/login"</span>, loginHandler,
+    middleware.<span class="fn">NewRateLimiter</span>(middleware.RateLimiterOptions{
+        Requests: <span class="nm">5</span>,
+        Per:      time.Minute,
+        Message:  <span class="str">"Too many login attempts"</span>,
+    }),
+)</pre>
+        </div>
+      </div>
+
+      <!-- MW: ETAG -->
+      <div class="doc-section" id="doc-mw-etag">
+        <h2>ETag Cache <span class="badge badge-mw">middleware</span></h2>
+        <p>Computes an MD5 ETag from the response body. On subsequent requests with a matching <code>If-None-Match</code>, returns <code>304 Not Modified</code> with an empty body — saving bandwidth.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre>cache := middleware.<span class="fn">NewETagCache</span>()
+router.<span class="fn">Use</span>(cache.<span class="fn">ETagMiddleware</span>())
+
+<span class="cm">// Client flow:
+// → GET /data
+// ← 200 ETag: "abc123"
+// → GET /data  If-None-Match: "abc123"
+// ← 304 Not Modified (empty body)</span></pre>
+        </div>
+      </div>
+
+      <!-- MW: COMPRESS -->
+      <div class="doc-section" id="doc-mw-compress">
+        <h2>Compression <span class="badge badge-mw">middleware</span></h2>
+        <p>Negotiates the best encoding from the client's <code>Accept-Encoding</code> header. Priority: Brotli → Gzip → Deflate → none.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre>router.<span class="fn">Use</span>(middleware.<span class="fn">CompressionMiddleware</span>())
+<span class="cm">// Sets Content-Encoding: br / gzip / deflate automatically</span></pre>
+        </div>
+      </div>
+
+      <!-- MW: SWAGGER -->
+      <div class="doc-section" id="doc-mw-swagger">
+        <h2>Swagger / OpenAPI 3.1 <span class="badge badge-new">new</span></h2>
+        <p>Annotate routes at registration time using Go structs. Breeze reflects the types to produce a live OpenAPI 3.1 spec — no YAML, no code generation, no build step.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Types — use json + description + example struct tags</span>
+<span class="kw">type</span> CreateUserRequest <span class="kw">struct</span> {
+    Name  <span class="tp">string</span> <span class="str">`json:"name"  description:"Full name"    example:"Alice"`</span>
+    Email <span class="tp">string</span> <span class="str">`json:"email" description:"Email address" example:"alice@example.com"`</span>
+    Age   <span class="tp">int</span>    <span class="str">`json:"age"   description:"Age in years" example:"30"`</span>
+}
+<span class="kw">type</span> UserResponse <span class="kw">struct</span> {
+    ID    <span class="tp">string</span> <span class="str">`json:"id"`</span>
+    Name  <span class="tp">string</span> <span class="str">`json:"name"`</span>
+    Email <span class="tp">string</span> <span class="str">`json:"email"`</span>
+}
+
+<span class="cm">// Enable once before routes</span>
+router.<span class="fn">Use</span>(middleware.<span class="fn">SwaggerMiddleware</span>(router, middleware.SwaggerOptions{
+    Title:    <span class="str">"Users API"</span>,
+    Version:  <span class="str">"2.0.0"</span>,
+    JSONPath: <span class="str">"/swagger.json"</span>,
+    UIPath:   <span class="str">"/swagger"</span>,
+}))
+
+<span class="cm">// Annotate each route</span>
+router.<span class="fn">Handle</span>(breeze.POST, <span class="str">"/users"</span>, createUser,
+    middleware.<span class="fn">DocPOST</span>(<span class="str">"/users"</span>, swagger.RouteDoc{
+        Title: <span class="str">"Create user"</span>,
+        Tags:  []<span class="tp">string</span>{<span class="str">"Users"</span>},
+        Input: []swagger.InputGroup{
+            {Type: swagger.InputBody, Fields: CreateUserRequest{}, Required: <span class="kw">true</span>},
+        },
+        Output:       UserResponse{},
+        OutputStatus: <span class="nm">201</span>,
+    }),
+)
+
+router.<span class="fn">Handle</span>(breeze.GET, <span class="str">"/users/:id"</span>, getUser,
+    middleware.<span class="fn">DocGET</span>(<span class="str">"/users/:id"</span>, swagger.RouteDoc{
+        Title: <span class="str">"Get user"</span>,
+        Tags:  []<span class="tp">string</span>{<span class="str">"Users"</span>},
+        Input: []swagger.InputGroup{
+            {Type: swagger.InputParams, Fields: <span class="kw">struct</span>{ ID <span class="tp">string</span> <span class="str">`json:"id"`</span> }{}},
+            {Type: swagger.InputQuery,  Fields: <span class="kw">struct</span>{ Fields <span class="tp">string</span> <span class="str">`json:"fields,omitempty"`</span> }{}},
+        },
+        Output: UserResponse{},
+    }),
+)</pre>
+        </div>
+        <h3>InputGroup Types</h3>
+        <table class="doc-table">
+          <tr><th>Constant</th><th>Source</th><th>OpenAPI Location</th></tr>
+          <tr><td>swagger.InputBody</td><td>JSON request body</td><td>requestBody</td></tr>
+          <tr><td>swagger.InputQuery</td><td>URL query params</td><td>query</td></tr>
+          <tr><td>swagger.InputParams</td><td>Path parameters</td><td>path</td></tr>
+          <tr><td>swagger.InputHeader</td><td>Request headers</td><td>header</td></tr>
+        </table>
+      </div>
+
+      <!-- FILE UPLOAD -->
+      <div class="doc-section" id="doc-upload">
+        <h2>File Uploads</h2>
+        <p>Parse multipart forms and save files to disk — no dependency on <code>http.Request</code>.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Parse all parts at once</span>
+files, fields, err := ctx.<span class="fn">ParseMultipart</span>(<span class="nm">10</span> &lt;&lt; <span class="nm">20</span>) <span class="cm">// 10 MB max per file</span>
+<span class="kw">if</span> err != <span class="kw">nil</span> {
+    ctx.<span class="fn">Status</span>(<span class="nm">400</span>); ctx.<span class="fn">WriteString</span>(err.<span class="fn">Error</span>()); <span class="kw">return</span>
+}
+
+uf := files[<span class="str">"avatar"</span>][<span class="nm">0</span>]
+fmt.<span class="fn">Println</span>(uf.Filename, uf.ContentType, uf.Size)
+
+<span class="cm">// Or save directly to disk</span>
+saved, err := ctx.<span class="fn">SaveUploadedFile</span>(<span class="str">"avatar"</span>, <span class="str">"./uploads/avatar.jpg"</span>, <span class="nm">5</span>&lt;&lt;<span class="nm">20</span>)
+<span class="kw">if</span> err != <span class="kw">nil</span> {
+    ctx.<span class="fn">Status</span>(<span class="nm">400</span>); ctx.<span class="fn">WriteString</span>(err.<span class="fn">Error</span>()); <span class="kw">return</span>
+}
+ctx.<span class="fn">JSON</span>(map[<span class="tp">string</span>]<span class="tp">string</span>{<span class="str">"saved"</span>: saved})</pre>
+        </div>
+        <h3>UploadedFile Fields</h3>
+        <table class="doc-table">
+          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+          <tr><td>Field</td><td>string</td><td>Form field name</td></tr>
+          <tr><td>Filename</td><td>string</td><td>Original filename from the browser</td></tr>
+          <tr><td>ContentType</td><td>string</td><td>From Content-Type header or auto-sniffed</td></tr>
+          <tr><td>Size</td><td>int64</td><td>Size in bytes</td></tr>
+          <tr><td>Content</td><td>[]byte</td><td>Raw file bytes</td></tr>
+        </table>
+      </div>
+
+      <!-- STATIC -->
+      <div class="doc-section" id="doc-static">
+        <h2>Static Files</h2>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Serve ./public/* at /assets/*</span>
+router.<span class="fn">ServeStatic</span>(<span class="str">"/assets"</span>, <span class="str">"./public"</span>)
+
+<span class="cm">// Auto-serve ./public/index.html at GET / (no explicit route needed)</span>
+<span class="cm">// Directory traversal is sanitized with filepath.Clean</span>
+<span class="cm">// MIME types resolved by extension, fallback to content sniffing</span></pre>
+        </div>
+      </div>
+
+      <!-- WORKER POOL -->
+      <div class="doc-section" id="doc-pool">
+        <h2>Worker Pool</h2>
+        <p>Off-loads handler execution from the gnet event loop so slow handlers don't block all connections on a reactor.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Size to NumCPU (good for I/O-bound handlers)</span>
+pool := breeze.<span class="fn">NewWorkerPool</span>(runtime.<span class="fn">NumCPU</span>())
+
+<span class="cm">// Custom concurrency</span>
+pool := breeze.<span class="fn">NewWorkerPool</span>(<span class="nm">32</span>)
+
+<span class="cm">// Graceful shutdown (wait up to 5s for in-flight tasks)</span>
+ctx, cancel := context.<span class="fn">WithTimeout</span>(context.<span class="fn">Background</span>(), <span class="nm">5</span>*time.Second)
+<span class="kw">defer</span> <span class="fn">cancel</span>()
+pool.<span class="fn">Shutdown</span>(ctx)
+
+<span class="cm">// Pass nil to skip the pool and use raw goroutines</span>
+app := breeze.<span class="fn">New</span>(router, <span class="kw">nil</span>)</pre>
+        </div>
+        <table class="doc-table">
+          <tr><th>Scenario</th><th>Behaviour</th></tr>
+          <tr><td>Queue has capacity</td><td>Task enqueued normally (channel buffer = workers × 16)</td></tr>
+          <tr><td>Queue full (burst)</td><td>Falls back to <code>go task()</code> — event loop is never blocked</td></tr>
+          <tr><td>pool is nil</td><td>Uses <code>go exec()</code> per request</td></tr>
+        </table>
+      </div>
+
+    </div><!-- /docs-content -->
+  </div><!-- /docs-layout -->
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">breeze</div>
+      <ul class="footer-links">
+        <li><a href="#doc-install">Docs</a></li>
+        <li><a href="#performance">Benchmarks</a></li>
+        <li><a href="https://github.com/nelthaarion/breeze" target="_blank">GitHub</a></li>
+        <li><a href="https://github.com/nelthaarion/breeze/blob/main/LICENSE" target="_blank">MIT License</a></li>
+      </ul>
+      <span class="footer-copy">© 2026 Nelthaarion. MIT License.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ── TERMINAL TYPEWRITER ── */
+const lines = [
+  {t:'comment', s:'// main.go — a Breeze server in 18 lines'},
+  {t:'blank'},
+  {t:'code',    s:'<span class="t-kw">package</span> <span class="t-pkg">main</span>'},
+  {t:'blank'},
+  {t:'code',    s:'<span class="t-kw">import</span> ('},
+  {t:'code',    s:'    <span class="t-str">"runtime"</span>'},
+  {t:'code',    s:'    <span class="t-str">"github.com/nelthaarion/breeze"</span>'},
+  {t:'code',    s:'    middleware <span class="t-str">"github.com/nelthaarion/breeze/middlewares"</span>'},
+  {t:'code',    s:')'},
+  {t:'blank'},
+  {t:'code',    s:'<span class="t-kw">func</span> <span class="t-fn">main</span>() {'},
+  {t:'code',    s:'    router := breeze.<span class="t-fn">NewRouter</span>()'},
+  {t:'code',    s:'    router.<span class="t-fn">Use</span>(middleware.<span class="t-fn">LoggingMiddleware</span>())'},
+  {t:'code',    s:'    router.<span class="t-fn">Use</span>(middleware.<span class="t-fn">DefaultSecurityMiddleware</span>())'},
+  {t:'blank'},
+  {t:'code',    s:'    router.<span class="t-fn">Handle</span>(breeze.GET, <span class="t-str">"/users/:id"</span>, getUser)'},
+  {t:'blank'},
+  {t:'code',    s:'    pool := breeze.<span class="t-fn">NewWorkerPool</span>(runtime.<span class="t-fn">NumCPU</span>())'},
+  {t:'code',    s:'    breeze.<span class="t-fn">New</span>(router, pool).<span class="t-fn">Run</span>(<span class="t-num">3000</span>, <span class="t-kw">true</span>)'},
+  {t:'code',    s:'}'},
+];
+
+const out = document.getElementById('terminal-output');
+let lineIdx = 0, charIdx = 0, currentEl = null;
+
+function getPlainLen(html) {
+  const d = document.createElement('div');
+  d.innerHTML = html;
+  return d.textContent.length;
+}
+
+function appendChar() {
+  if (lineIdx >= lines.length) {
+    if (currentEl) {
+      const c = currentEl.querySelector('.cursor');
+      if (c) c.style.display = 'none';
+    }
+    const cur = document.createElement('span');
+    cur.className = 'cursor';
+    out.appendChild(cur);
+    return;
+  }
+
+  const line = lines[lineIdx];
+
+  if (line.t === 'blank') {
+    if (currentEl) { const c = currentEl.querySelector('.cursor'); if(c) c.remove(); }
+    out.appendChild(document.createElement('br'));
+    lineIdx++; charIdx = 0; currentEl = null;
+    setTimeout(appendChar, 40);
+    return;
+  }
+
+  if (charIdx === 0) {
+    if (currentEl) { const c = currentEl.querySelector('.cursor'); if(c) c.remove(); }
+    currentEl = document.createElement('div');
+    currentEl.style.whiteSpace = 'pre';
+    out.appendChild(currentEl);
+  }
+
+  const raw = line.s;
+  const plain = (() => { const d=document.createElement('div'); d.innerHTML=raw; return d.textContent; })();
+
+  if (charIdx < plain.length) {
+    charIdx++;
+    const d = document.createElement('div'); d.innerHTML = raw;
+    const txt = d.textContent.slice(0, charIdx);
+    // build partial HTML — just slice text safely
+    currentEl.innerHTML = buildPartialHTML(raw, charIdx);
+    // add cursor
+    const cur = document.createElement('span');
+    cur.className = 'cursor';
+    currentEl.appendChild(cur);
+    setTimeout(appendChar, line.t === 'comment' ? 22 : 28);
+  } else {
+    currentEl.innerHTML = raw;
+    lineIdx++; charIdx = 0;
+    setTimeout(appendChar, 60);
+  }
+}
+
+function buildPartialHTML(html, n) {
+  const d = document.createElement('div'); d.innerHTML = html;
+  let count = 0;
+  function walk(node) {
+    if (count >= n) { node.parentNode && node.parentNode.removeChild(node); return; }
+    if (node.nodeType === 3) {
+      const avail = n - count;
+      if (node.textContent.length > avail) { node.textContent = node.textContent.slice(0, avail); count = n; }
+      else { count += node.textContent.length; }
+    } else {
+      Array.from(node.childNodes).forEach(walk);
+      if (node.childNodes.length === 0 && node.nodeType === 1 && count >= n) {
+        node.parentNode && node.parentNode.removeChild(node);
+      }
+    }
+  }
+  Array.from(d.childNodes).forEach(walk);
+  return d.innerHTML;
+}
+
+setTimeout(appendChar, 600);
+
+/* ── TABS ── */
+function switchTab(btn, id) {
+  document.querySelectorAll('.mw-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.mw-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+/* ── COPY CODE ── */
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    btn.textContent = 'copied!';
+    setTimeout(() => btn.textContent = 'copy', 1500);
+  });
+}
+
+/* ── SCROLL ANIMATIONS ── */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // animate perf bars
+      const fill = e.target.querySelector('.perf-fill');
+      if (fill) fill.style.width = fill.dataset.w;
+    }
+  });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.fade-up, .perf-bar-group').forEach(el => observer.observe(el));
+
+/* ── SIDEBAR ACTIVE LINK ── */
+const sections = document.querySelectorAll('.doc-section');
+const sideLinks = document.querySelectorAll('.sidebar-links a');
+const docsScroll = document.querySelector('.docs-content');
+
+if (docsScroll) {
+  docsScroll.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (s.offsetTop - docsScroll.scrollTop < 200) current = s.id;
+    });
+    sideLinks.forEach(a => {
+      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+    });
+  });
+}
+</script>
+</body>
+</html>
