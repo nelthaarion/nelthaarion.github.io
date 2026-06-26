@@ -249,6 +249,7 @@ code:not(pre code){
 }
 .badge-new{color:var(--green);border-color:rgba(57,255,20,.3);background:rgba(57,255,20,.05)}
 .badge-mw{color:var(--yellow);border-color:rgba(255,214,0,.3);background:rgba(255,214,0,.05)}
+.badge-ws{color:#BD93F9;border-color:rgba(189,147,249,.3);background:rgba(189,147,249,.05)}
 
 /* ── PERF ── */
 #performance{background:var(--bg2)}
@@ -338,6 +339,7 @@ footer{
     <li><a href="#performance">Performance</a></li>
     <li><a href="#docs">Docs</a></li>
     <li><a href="#middlewares-section">Middlewares</a></li>
+    <li><a href="#doc-websocket">WebSocket</a></li>
   </ul>
   <a class="nav-cta" href="https://github.com/nelthaarion/breeze" target="_blank">GitHub →</a>
 </nav>
@@ -351,8 +353,8 @@ footer{
         <h1>Built for<br/><em>raw speed.</em><br/>Shipped clean.</h1>
         <p class="hero-sub">
           Breeze is an event-driven HTTP framework for Go built on gnet.
-          Zero-allocation hot paths, a composable middleware chain, and
-          built-in Swagger docs — out of the box.
+          Zero-allocation hot paths, a composable middleware chain, native
+          WebSocket support with a built-in hub, and Swagger docs — out of the box.
         </p>
         <div class="hero-actions">
           <a class="btn-primary" href="#docs">Get Started</a>
@@ -416,6 +418,11 @@ footer{
         <div class="feat-desc">Fixed goroutine pool with 16× buffered channel absorbs bursts. Queue-full fallback spawns a goroutine rather than blocking the event loop.</div>
       </div>
       <div class="feat-card fade-up">
+        <div class="feat-icon">🔌</div>
+        <div class="feat-title">Native WebSocket</div>
+        <div class="feat-desc">RFC 6455 WebSocket built directly into the gnet event loop. Zero goroutine-per-connection. Built-in hub for broadcast, per-client send, and connection count.</div>
+      </div>
+      <div class="feat-card fade-up">
         <div class="feat-icon">📄</div>
         <div class="feat-title">OpenAPI 3.1 Built-In</div>
         <div class="feat-desc">Annotate routes with Go structs. Breeze reflects types at startup to generate a live Swagger spec. No YAML. No codegen. Just <code>/swagger</code>.</div>
@@ -429,11 +436,6 @@ footer{
         <div class="feat-icon">📁</div>
         <div class="feat-title">File Uploads</div>
         <div class="feat-desc">Multipart form parsing with size limits and content-type sniffing built into <code>Context</code>. One-line save-to-disk API. No stdlib <code>http.Request</code> required.</div>
-      </div>
-      <div class="feat-card fade-up">
-        <div class="feat-icon">🗂️</div>
-        <div class="feat-title">Static File Serving</div>
-        <div class="feat-desc">Register a directory with one line. Directory traversal sanitized via <code>filepath.Clean</code>. MIME type from extension with fallback to content sniffing.</div>
       </div>
       <div class="feat-card fade-up">
         <div class="feat-icon">🔒</div>
@@ -510,6 +512,7 @@ footer{
       <button class="mw-tab" onclick="switchTab(this,'tab-compress')">Compression</button>
       <button class="mw-tab" onclick="switchTab(this,'tab-helmet')">Helmet</button>
       <button class="mw-tab" onclick="switchTab(this,'tab-swagger')">Swagger</button>
+      <button class="mw-tab" onclick="switchTab(this,'tab-websocket')">WebSocket</button>
     </div>
 
     <div id="tab-jwt" class="mw-panel active">
@@ -647,6 +650,31 @@ router.<span class="fn">Handle</span>(breeze.POST, <span class="str">"/users"</s
 // Visit /swagger.json → raw OpenAPI 3.1 JSON</span></pre>
       </div>
     </div>
+
+    <div id="tab-websocket" class="mw-panel">
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="cm">// Register a WebSocket endpoint — returns the shared WSHub</span>
+app := breeze.<span class="fn">New</span>(router, pool)
+
+hub := app.<span class="fn">WebSocket</span>(<span class="str">"/ws"</span>, &amp;breeze.WSHandlerFunc{
+    Connect: <span class="kw">func</span>(conn *breeze.WSConn) {
+        conn.<span class="fn">SendText</span>(<span class="str">"welcome"</span>)
+    },
+    Message: <span class="kw">func</span>(conn *breeze.WSConn, opcode <span class="tp">byte</span>, payload []<span class="tp">byte</span>) {
+        hub.<span class="fn">BroadcastText</span>(<span class="tp">string</span>(payload))  <span class="cm">// echo to all clients</span>
+    },
+    Close: <span class="kw">func</span>(conn *breeze.WSConn, code <span class="tp">uint16</span>, reason <span class="tp">string</span>) {
+        hub.<span class="fn">BroadcastText</span>(<span class="str">"a user left"</span>)
+    },
+})
+
+<span class="cm">// Query active connections from any HTTP handler</span>
+router.<span class="fn">Handle</span>(breeze.GET, <span class="str">"/ws/stats"</span>, <span class="kw">func</span>(ctx *breeze.Context) {
+    ctx.<span class="fn">JSON</span>(map[<span class="tp">string</span>]<span class="tp">int64</span>{<span class="str">"connections"</span>: hub.<span class="fn">Count</span>()})
+})</pre>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -658,7 +686,7 @@ router.<span class="fn">Handle</span>(breeze.POST, <span class="str">"/users"</s
       <div class="sidebar-section">
         <span class="sidebar-head">Getting Started</span>
         <ul class="sidebar-links">
-          <li><a href="#doc-install" class="active">Installation</a></li>
+          <li><a href="#doc-install">Installation</a></li>
           <li><a href="#doc-quickstart">Quick Start</a></li>
           <li><a href="#doc-server">Server Config</a></li>
         </ul>
@@ -685,6 +713,16 @@ router.<span class="fn">Handle</span>(breeze.POST, <span class="str">"/users"</s
           <li><a href="#doc-mw-etag">ETag Cache</a></li>
           <li><a href="#doc-mw-compress">Compression</a></li>
           <li><a href="#doc-mw-swagger">Swagger</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-head">WebSocket</span>
+        <ul class="sidebar-links">
+          <li><a href="#doc-websocket">Overview</a></li>
+          <li><a href="#doc-ws-handler">Handler Interface</a></li>
+          <li><a href="#doc-ws-wsconn">WSConn</a></li>
+          <li><a href="#doc-ws-hub">WSHub</a></li>
+          <li><a href="#doc-ws-close">Close Codes</a></li>
         </ul>
       </div>
       <div class="sidebar-section">
@@ -1122,6 +1160,219 @@ router.<span class="fn">Handle</span>(breeze.GET, <span class="str">"/users/:id"
         </table>
       </div>
 
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+      <!-- WEBSOCKET DOCS                                                  -->
+      <!-- ═══════════════════════════════════════════════════════════════ -->
+
+      <!-- WS: OVERVIEW -->
+      <div class="doc-section" id="doc-websocket">
+        <h2>WebSocket <span class="badge badge-ws">built-in</span></h2>
+        <p>Breeze implements RFC 6455 WebSocket directly inside the gnet event loop — no goroutine-per-connection, no third-party WS library. After the HTTP upgrade handshake, the connection is promoted to WebSocket mode. All subsequent traffic for that file descriptor bypasses the HTTP parser entirely and is handled by the WebSocket frame engine.</p>
+        <p>WebSocket routes are registered on the <code>*Breeze</code> app (not the router) using <code>app.WebSocket()</code>, which returns the shared <code>*WSHub</code> immediately. The hub can be injected into your handler at construction time and used from any goroutine.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="kw">package</span> <span class="pk">main</span>
+
+<span class="kw">import</span> (
+    <span class="str">"fmt"</span>
+    <span class="str">"runtime"</span>
+    <span class="str">"github.com/nelthaarion/breeze"</span>
+)
+
+<span class="cm">// ── Struct-based handler ─────────────────────────────────────────────</span>
+<span class="kw">type</span> ChatHandler <span class="kw">struct</span> {
+    hub *breeze.WSHub
+}
+
+<span class="kw">func</span> (h *ChatHandler) <span class="fn">OnConnect</span>(conn *breeze.WSConn) {
+    fmt.<span class="fn">Printf</span>(<span class="str">"[ws] connected: %s (total: %d)\n"</span>, conn.<span class="fn">RemoteAddr</span>(), h.hub.<span class="fn">Count</span>())
+    h.hub.<span class="fn">BroadcastExcept</span>(breeze.WsOpText, []<span class="tp">byte</span>(<span class="str">"a user joined"</span>), conn)
+}
+
+<span class="kw">func</span> (h *ChatHandler) <span class="fn">OnMessage</span>(conn *breeze.WSConn, opcode <span class="tp">byte</span>, payload []<span class="tp">byte</span>) {
+    <span class="kw">if</span> opcode == breeze.WsOpText {
+        msg := fmt.<span class="fn">Sprintf</span>(<span class="str">"[%s]: %s"</span>, conn.<span class="fn">RemoteAddr</span>(), <span class="tp">string</span>(payload))
+        h.hub.<span class="fn">BroadcastText</span>(msg)
+    } <span class="kw">else</span> {
+        conn.<span class="fn">SendBinary</span>(payload) <span class="cm">// echo binary back</span>
+    }
+}
+
+<span class="kw">func</span> (h *ChatHandler) <span class="fn">OnClose</span>(conn *breeze.WSConn, code <span class="tp">uint16</span>, reason <span class="tp">string</span>) {
+    h.hub.<span class="fn">BroadcastText</span>(<span class="str">"a user left"</span>)
+}
+
+<span class="kw">func</span> <span class="fn">main</span>() {
+    router := breeze.<span class="fn">NewRouter</span>()
+    pool   := breeze.<span class="fn">NewWorkerPool</span>(runtime.<span class="fn">NumCPU</span>())
+    app    := breeze.<span class="fn">New</span>(router, pool)
+
+    <span class="cm">// WebSocket() registers the route and returns the hub immediately.</span>
+    chat := &amp;ChatHandler{}
+    chat.hub = app.<span class="fn">WebSocket</span>(<span class="str">"/ws"</span>, chat)
+
+    app.<span class="fn">Run</span>(<span class="nm">3000</span>, <span class="kw">true</span>)
+}</pre>
+        </div>
+        <h3>Architecture note</h3>
+        <p>On every incoming data event, Breeze checks a <code>sync.Map</code> (O(1), lock-free) to see if the file descriptor belongs to a promoted WebSocket connection. If it does, the HTTP parser is never invoked — the data goes straight to the WebSocket frame engine. This means WebSocket connections carry zero HTTP overhead after the upgrade and HTTP connections carry zero WebSocket overhead.</p>
+      </div>
+
+      <!-- WS: HANDLER INTERFACE -->
+      <div class="doc-section" id="doc-ws-handler">
+        <h2>Handler Interface <span class="badge badge-ws">websocket</span></h2>
+        <p>Implement <code>WSHandler</code> on a struct, or use the inline <code>WSHandlerFunc</code> shorthand. Fields left <code>nil</code> in <code>WSHandlerFunc</code> are silently skipped.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Full interface — implement on your own struct</span>
+<span class="kw">type</span> WSHandler <span class="kw">interface</span> {
+    <span class="fn">OnConnect</span>(conn *WSConn)
+    <span class="fn">OnMessage</span>(conn *WSConn, opcode <span class="tp">byte</span>, payload []<span class="tp">byte</span>)
+    <span class="fn">OnClose</span>(conn *WSConn, code <span class="tp">uint16</span>, reason <span class="tp">string</span>)
+}
+
+<span class="cm">// Inline shorthand — nil fields are no-ops</span>
+app.<span class="fn">WebSocket</span>(<span class="str">"/ws/echo"</span>, &amp;breeze.WSHandlerFunc{
+    Connect: <span class="kw">func</span>(conn *breeze.WSConn) {
+        conn.<span class="fn">SendText</span>(<span class="str">"echo server ready"</span>)
+    },
+    Message: <span class="kw">func</span>(conn *breeze.WSConn, opcode <span class="tp">byte</span>, payload []<span class="tp">byte</span>) {
+        conn.<span class="fn">Send</span>(opcode, payload)  <span class="cm">// reflect back verbatim</span>
+    },
+    <span class="cm">// Close field omitted — no-op on disconnect</span>
+})</pre>
+        </div>
+        <h3>Opcode constants</h3>
+        <table class="doc-table">
+          <tr><th>Constant</th><th>Value</th><th>Use</th></tr>
+          <tr><td>breeze.WsOpText</td><td>0x1</td><td>UTF-8 text message</td></tr>
+          <tr><td>breeze.WsOpBinary</td><td>0x2</td><td>Binary message (any payload)</td></tr>
+        </table>
+        <p>Ping, Pong, and Close opcodes are handled automatically by the engine and are never surfaced to <code>OnMessage</code>.</p>
+      </div>
+
+      <!-- WS: WSCONN -->
+      <div class="doc-section" id="doc-ws-wsconn">
+        <h2>WSConn <span class="badge badge-ws">websocket</span></h2>
+        <p><code>*WSConn</code> is the per-client handle passed to every callback. It wraps the underlying <code>gnet.Conn</code> with WebSocket framing and is safe to call from any goroutine.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Send a text message</span>
+conn.<span class="fn">SendText</span>(<span class="str">"hello"</span>)
+
+<span class="cm">// Send binary data</span>
+conn.<span class="fn">SendBinary</span>([]<span class="tp">byte</span>{<span class="nm">0x01</span>, <span class="nm">0x02</span>})
+
+<span class="cm">// Send with explicit opcode</span>
+conn.<span class="fn">Send</span>(breeze.WsOpText, []<span class="tp">byte</span>(<span class="str">"raw"</span>))
+
+<span class="cm">// Graceful close — sends a Close frame, then closes the TCP connection</span>
+<span class="cm">// Code 1000 = Normal Closure, 1001 = Going Away, 1008 = Policy Violation, …</span>
+conn.<span class="fn">Close</span>(<span class="nm">1000</span>, <span class="str">"bye"</span>)
+
+<span class="cm">// Remote address of the client</span>
+addr := conn.<span class="fn">RemoteAddr</span>()  <span class="cm">// e.g. "192.168.1.5:54321"</span></pre>
+        </div>
+        <table class="doc-table">
+          <tr><th>Method</th><th>Signature</th><th>Notes</th></tr>
+          <tr><td>Send</td><td>(opcode byte, payload []byte) error</td><td>Low-level send with explicit opcode</td></tr>
+          <tr><td>SendText</td><td>(msg string) error</td><td>Convenience wrapper for text frames</td></tr>
+          <tr><td>SendBinary</td><td>(msg []byte) error</td><td>Convenience wrapper for binary frames</td></tr>
+          <tr><td>Close</td><td>(code uint16, reason string)</td><td>Sends Close frame; idempotent</td></tr>
+          <tr><td>RemoteAddr</td><td>() string</td><td>Client IP:port string</td></tr>
+        </table>
+        <h3>Message fragmentation</h3>
+        <p>Breeze handles RFC 6455 fragmentation transparently. Continuation frames are accumulated in a per-connection buffer and <code>OnMessage</code> is only called once the final frame (FIN=1) arrives. The default maximum payload size per message is <strong>4 MiB</strong>. Protocol errors or oversized payloads trigger an automatic Close with code 1002 or 1009.</p>
+      </div>
+
+      <!-- WS: HUB -->
+      <div class="doc-section" id="doc-ws-hub">
+        <h2>WSHub <span class="badge badge-ws">websocket</span></h2>
+        <p><code>*WSHub</code> is the shared broadcast hub — one instance per <code>*Breeze</code> app, regardless of how many WebSocket routes are registered. It is safe to call from any goroutine. <code>Broadcast</code> builds the WebSocket frame once and delivers it to all clients concurrently via the worker pool.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Retrieve the hub from the app at any point after WebSocket() is called</span>
+hub := app.<span class="fn">Hub</span>()  <span class="cm">// returns nil if no WS routes registered</span>
+
+<span class="cm">// Broadcast text to every connected client</span>
+hub.<span class="fn">BroadcastText</span>(<span class="str">"server restarting in 10s"</span>)
+
+<span class="cm">// Broadcast binary to every connected client</span>
+hub.<span class="fn">BroadcastBinary</span>(protobufPayload)
+
+<span class="cm">// Broadcast with explicit opcode</span>
+hub.<span class="fn">Broadcast</span>(breeze.WsOpText, []<span class="tp">byte</span>(<span class="str">"raw"</span>))
+
+<span class="cm">// Broadcast to all clients except one (e.g. exclude the sender)</span>
+hub.<span class="fn">BroadcastExcept</span>(breeze.WsOpText, []<span class="tp">byte</span>(msg), senderConn)
+
+<span class="cm">// Active connection count (atomic read — no lock)</span>
+n := hub.<span class="fn">Count</span>()  <span class="cm">// int64</span>
+
+<span class="cm">// Expose connection count via HTTP</span>
+router.<span class="fn">Handle</span>(breeze.GET, <span class="str">"/ws/stats"</span>, <span class="kw">func</span>(ctx *breeze.Context) {
+    ctx.<span class="fn">JSON</span>(map[<span class="tp">string</span>]<span class="tp">int64</span>{<span class="str">"connections"</span>: hub.<span class="fn">Count</span>()})
+})</pre>
+        </div>
+        <table class="doc-table">
+          <tr><th>Method</th><th>Signature</th><th>Notes</th></tr>
+          <tr><td>Broadcast</td><td>(opcode byte, payload []byte)</td><td>Frame built once, delivered to all</td></tr>
+          <tr><td>BroadcastText</td><td>(msg string)</td><td>Convenience wrapper</td></tr>
+          <tr><td>BroadcastBinary</td><td>(msg []byte)</td><td>Convenience wrapper</td></tr>
+          <tr><td>BroadcastExcept</td><td>(opcode byte, payload []byte, skip *WSConn)</td><td>Skips one connection</td></tr>
+          <tr><td>Count</td><td>() int64</td><td>Atomic, no lock</td></tr>
+        </table>
+        <h3>Multiple WebSocket routes</h3>
+        <p>All routes registered with <code>app.WebSocket()</code> share the same hub. <code>BroadcastText</code> reaches clients on <em>all</em> WS paths. If you need isolated rooms, implement per-room filtering in <code>OnMessage</code> using <code>BroadcastExcept</code> or maintain your own client sets.</p>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Multiple endpoints — same hub is returned each time</span>
+hub1 := app.<span class="fn">WebSocket</span>(<span class="str">"/ws/chat"</span>, chatHandler)
+hub2 := app.<span class="fn">WebSocket</span>(<span class="str">"/ws/events"</span>, eventsHandler)
+<span class="cm">// hub1 == hub2 == app.Hub()</span></pre>
+        </div>
+      </div>
+
+      <!-- WS: CLOSE CODES -->
+      <div class="doc-section" id="doc-ws-close">
+        <h2>Close Codes <span class="badge badge-ws">websocket</span></h2>
+        <p>Breeze sends and receives standard RFC 6455 close codes. Your <code>OnClose</code> callback receives the code and reason string extracted from the Close frame. If the TCP connection drops without a Close frame (network loss, RST), Breeze synthesises code <strong>1006</strong> with reason <code>"abnormal closure"</code>.</p>
+        <table class="doc-table">
+          <tr><th>Code</th><th>Name</th><th>When</th></tr>
+          <tr><td>1000</td><td>Normal Closure</td><td>Clean close initiated by either side</td></tr>
+          <tr><td>1001</td><td>Going Away</td><td>Server shutting down or client navigating away</td></tr>
+          <tr><td>1002</td><td>Protocol Error</td><td>Malformed frame — Breeze closes automatically</td></tr>
+          <tr><td>1003</td><td>Unsupported Data</td><td>Unknown opcode — Breeze closes automatically</td></tr>
+          <tr><td>1006</td><td>Abnormal Closure</td><td>TCP disconnect without Close frame (synthesised)</td></tr>
+          <tr><td>1008</td><td>Policy Violation</td><td>Application-level rejection (use in your handler)</td></tr>
+          <tr><td>1009</td><td>Message Too Big</td><td>Payload exceeds <code>wsMaxPayloadDefault</code> (4 MiB)</td></tr>
+          <tr><td>1011</td><td>Internal Error</td><td>Unexpected server-side condition</td></tr>
+        </table>
+        <div class="code-block">
+          <div class="code-header"><span class="code-lang">go</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+          <pre><span class="cm">// Reject unauthenticated connections after upgrade</span>
+<span class="kw">func</span> (h *SecureHandler) <span class="fn">OnConnect</span>(conn *breeze.WSConn) {
+    <span class="kw">if</span> !<span class="fn">isAuthenticated</span>(conn) {
+        conn.<span class="fn">Close</span>(<span class="nm">1008</span>, <span class="str">"policy violation: not authenticated"</span>)
+        <span class="kw">return</span>
+    }
+    conn.<span class="fn">SendText</span>(<span class="str">"authenticated"</span>)
+}
+
+<span class="cm">// Inspect why a connection closed</span>
+<span class="kw">func</span> (h *SecureHandler) <span class="fn">OnClose</span>(conn *breeze.WSConn, code <span class="tp">uint16</span>, reason <span class="tp">string</span>) {
+    <span class="kw">switch</span> code {
+    <span class="kw">case</span> <span class="nm">1000</span>:
+        fmt.<span class="fn">Println</span>(<span class="str">"clean disconnect"</span>)
+    <span class="kw">case</span> <span class="nm">1006</span>:
+        fmt.<span class="fn">Println</span>(<span class="str">"connection dropped unexpectedly"</span>)
+    <span class="kw">default</span>:
+        fmt.<span class="fn">Printf</span>(<span class="str">"closed code=%d reason=%q\n"</span>, code, reason)
+    }
+}</pre>
+        </div>
+      </div>
+
       <!-- FILE UPLOAD -->
       <div class="doc-section" id="doc-upload">
         <h2>File Uploads</h2>
@@ -1245,12 +1496,6 @@ const lines = [
 const out = document.getElementById('terminal-output');
 let lineIdx = 0, charIdx = 0, currentEl = null;
 
-function getPlainLen(html) {
-  const d = document.createElement('div');
-  d.innerHTML = html;
-  return d.textContent.length;
-}
-
 function appendChar() {
   if (lineIdx >= lines.length) {
     if (currentEl) {
@@ -1285,11 +1530,7 @@ function appendChar() {
 
   if (charIdx < plain.length) {
     charIdx++;
-    const d = document.createElement('div'); d.innerHTML = raw;
-    const txt = d.textContent.slice(0, charIdx);
-    // build partial HTML — just slice text safely
     currentEl.innerHTML = buildPartialHTML(raw, charIdx);
-    // add cursor
     const cur = document.createElement('span');
     cur.className = 'cursor';
     currentEl.appendChild(cur);
@@ -1354,22 +1595,55 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.fade-up, .perf-bar-group').forEach(el => observer.observe(el));
 
-/* ── SIDEBAR ACTIVE LINK ── */
-const sections = document.querySelectorAll('.doc-section');
-const sideLinks = document.querySelectorAll('.sidebar-links a');
-const docsScroll = document.querySelector('.docs-content');
+/* ── SIDEBAR ACTIVE LINK (fixed) ──
+   The docs-content div does NOT scroll — the window does.
+   We watch window scroll and compute which doc-section's top
+   is closest to (but still above) a threshold offset from the
+   top of the viewport, accounting for the fixed 60px nav bar. */
+(function() {
+  const OFFSET = 80; // px below the nav bar where a section is "active"
+  const sections   = Array.from(document.querySelectorAll('.doc-section[id]'));
+  const sideLinks  = Array.from(document.querySelectorAll('.sidebar-links a'));
 
-if (docsScroll) {
-  docsScroll.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(s => {
-      if (s.offsetTop - docsScroll.scrollTop < 200) current = s.id;
-    });
+  function getActiveId() {
+    let activeId = sections[0] ? sections[0].id : '';
+    for (const s of sections) {
+      const top = s.getBoundingClientRect().top;
+      if (top <= OFFSET) {
+        activeId = s.id;
+      } else {
+        break;
+      }
+    }
+    return activeId;
+  }
+
+  function updateLinks() {
+    const activeId = getActiveId();
     sideLinks.forEach(a => {
-      a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+      a.classList.toggle('active', a.getAttribute('href') === '#' + activeId);
     });
-  });
-}
+  }
+
+  window.addEventListener('scroll', updateLinks, { passive: true });
+  // Also scroll the sidebar so the active link stays visible
+  window.addEventListener('scroll', function() {
+    const activeLink = document.querySelector('.sidebar-links a.active');
+    if (activeLink) {
+      const sidebar = document.querySelector('.docs-sidebar');
+      if (sidebar) {
+        const linkTop    = activeLink.offsetTop;
+        const sideTop    = sidebar.scrollTop;
+        const sideHeight = sidebar.clientHeight;
+        if (linkTop < sideTop + 40 || linkTop > sideTop + sideHeight - 40) {
+          sidebar.scrollTop = linkTop - sideHeight / 2;
+        }
+      }
+    }
+  }, { passive: true });
+
+  updateLinks(); // run once on load
+})();
 </script>
 </body>
 </html>
