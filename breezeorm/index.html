@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BreezeORM — Fast Go ORM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #f7f8fa;
+    --surface:   #ffffff;
+    --surface-2: #f0f2f6;
+    --border:    #e2e6ee;
+    --border-soft: #eceff5;
+    --text:      #111827;
+    --text-2:    #374151;
+    --text-3:    #6b7280;
+    --text-4:    #9ca3af;
+    --accent:    #2563eb;
+    --accent-bg: #eff4ff;
+    --accent-bd: #c7d7fd;
+    --green:     #16a34a;
+    --green-bg:  #f0fdf4;
+    --purple:    #7c3aed;
+    --purple-bg: #f5f3ff;
+    --amber:     #d97706;
+    --amber-bg:  #fffbeb;
+    --red:       #dc2626;
+    --red-bg:    #fef2f2;
+    --sidebar-w: 260px;
+    --top-h:     56px;
+    --mono:      'JetBrains Mono', 'Fira Code', monospace;
+    --sans:      'Inter', -apple-system, sans-serif;
+    --radius:    8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Topbar ────────────────────────────────────────────── */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: var(--top-h);
+    background: rgba(247,248,250,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    z-index: 100;
+  }
+  .topbar-logo {
+    font-size: 17px; font-weight: 600; color: var(--text);
+    text-decoration: none; display: flex; align-items: center; gap: 8px;
+    letter-spacing: -0.3px;
+  }
+  .topbar-logo .logo-mark {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 13px; font-weight: 700; letter-spacing: -0.5px;
+  }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .topbar-badge {
+    font-size: 12px; font-family: var(--mono); background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 3px 8px; color: var(--text-3); font-weight: 500;
+  }
+  .topbar-link {
+    font-size: 13px; color: var(--text-3); text-decoration: none;
+    padding: 6px 10px; border-radius: var(--radius);
+    transition: background 0.15s, color 0.15s;
+  }
+  .topbar-link:hover { background: var(--surface-2); color: var(--text); }
+  .topbar-github {
+    display: flex; align-items: center; gap: 6px; font-size: 13px;
+    color: var(--text-2); text-decoration: none; padding: 6px 12px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .topbar-github:hover { background: var(--surface); border-color: var(--text-3); }
+
+  /* ── Layout ────────────────────────────────────────────── */
+  .layout { display: flex; margin-top: var(--top-h); min-height: calc(100vh - var(--top-h)); }
+
+  /* ── Sidebar ───────────────────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    position: sticky; top: var(--top-h); height: calc(100vh - var(--top-h));
+    overflow-y: auto; padding: 28px 0 40px;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .nav-section { margin-bottom: 8px; }
+  .nav-label {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-4);
+    padding: 8px 20px 4px; display: block;
+  }
+  .nav-link {
+    display: block; padding: 6px 20px; font-size: 13.5px; color: var(--text-2);
+    text-decoration: none; border-radius: 0;
+    transition: background 0.12s, color 0.12s;
+    border-left: 2px solid transparent;
+  }
+  .nav-link:hover { color: var(--text); background: var(--bg); }
+  .nav-link.active {
+    color: var(--accent); background: var(--accent-bg);
+    border-left-color: var(--accent); font-weight: 500;
+  }
+
+  /* ── Content ───────────────────────────────────────────── */
+  .content {
+    flex: 1; min-width: 0;
+    padding: 56px 64px 80px 72px;
+    max-width: 920px;
+  }
+
+  /* ── Section headings ──────────────────────────────────── */
+  .section { margin-bottom: 72px; scroll-margin-top: 80px; }
+  h1 { font-size: 38px; font-weight: 600; letter-spacing: -0.8px; line-height: 1.2; margin-bottom: 16px; color: var(--text); }
+  h2 { font-size: 24px; font-weight: 600; letter-spacing: -0.4px; margin-bottom: 12px; color: var(--text); margin-top: 48px; }
+  h3 { font-size: 17px; font-weight: 600; letter-spacing: -0.2px; margin-bottom: 8px; color: var(--text); margin-top: 32px; }
+  h4 { font-size: 14px; font-weight: 600; color: var(--text-2); margin-bottom: 6px; margin-top: 24px; }
+  p { color: var(--text-2); margin-bottom: 14px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Hero ──────────────────────────────────────────────── */
+  .hero { padding: 0 0 56px; border-bottom: 1px solid var(--border); margin-bottom: 56px; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--accent);
+    background: var(--accent-bg); border: 1px solid var(--accent-bd);
+    border-radius: 20px; padding: 4px 12px; margin-bottom: 20px;
+  }
+  .hero h1 { font-size: 42px; margin-bottom: 18px; }
+  .hero-sub { font-size: 17px; color: var(--text-3); max-width: 540px; line-height: 1.65; margin-bottom: 28px; }
+  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent); color: white; font-size: 14px; font-weight: 500;
+    padding: 10px 20px; border-radius: var(--radius); text-decoration: none;
+    transition: background 0.15s;
+  }
+  .btn-primary:hover { background: #1d4ed8; text-decoration: none; color: white; }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--surface); color: var(--text-2); font-size: 14px; font-weight: 500;
+    padding: 10px 20px; border-radius: var(--radius); text-decoration: none;
+    border: 1px solid var(--border); transition: border-color 0.15s, background 0.15s;
+  }
+  .btn-secondary:hover { border-color: var(--text-3); background: var(--bg); text-decoration: none; color: var(--text); }
+
+  /* ── Stat cards ─────────────────────────────────────────── */
+  .stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 32px 0; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 20px 22px;
+  }
+  .stat-num { font-size: 28px; font-weight: 600; letter-spacing: -0.8px; color: var(--text); }
+  .stat-label { font-size: 12.5px; color: var(--text-3); margin-top: 2px; }
+  .stat-accent { color: var(--accent); }
+  .stat-green { color: var(--green); }
+
+  /* ── Code blocks ────────────────────────────────────────── */
+  pre {
+    background: #0f1117; color: #c9d1d9;
+    border-radius: var(--radius-lg); padding: 20px 22px;
+    overflow-x: auto; font-family: var(--mono);
+    font-size: 13px; line-height: 1.65;
+    margin: 16px 0 20px; border: 1px solid #21262d;
+  }
+  pre .c  { color: #8b949e; }
+  pre .k  { color: #ff7b72; }
+  pre .kw { color: #79c0ff; }
+  pre .s  { color: #a5d6ff; }
+  pre .str{ color: #96d0ff; }
+  pre .fn { color: #d2a8ff; }
+  pre .t  { color: #ffa657; }
+  pre .cm { color: #8b949e; font-style: italic; }
+  pre .p  { color: #c9d1d9; }
+  code {
+    font-family: var(--mono); font-size: 13px;
+    background: var(--surface-2); color: var(--accent);
+    padding: 2px 6px; border-radius: 5px;
+    border: 1px solid var(--border-soft);
+  }
+  pre code { background: none; border: none; padding: 0; color: inherit; font-size: inherit; }
+
+  /* ── File label ─────────────────────────────────────────── */
+  .code-block { margin: 16px 0 20px; }
+  .code-label {
+    display: flex; align-items: center; gap: 6px;
+    background: #21262d; color: #8b949e; font-size: 12px; font-family: var(--mono);
+    padding: 8px 16px; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border: 1px solid #21262d; border-bottom: none;
+  }
+  .code-label-dot { width: 10px; height: 10px; border-radius: 50%; background: #2ea043; }
+  .code-block pre { border-radius: 0 0 var(--radius-lg) var(--radius-lg); margin: 0; }
+
+  /* ── Callout ────────────────────────────────────────────── */
+  .callout {
+    display: flex; gap: 14px; border-radius: var(--radius-lg);
+    padding: 16px 18px; margin: 20px 0; border: 1px solid;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { font-size: 14px; }
+  .callout-body strong { font-weight: 600; display: block; margin-bottom: 4px; }
+  .callout-body p { margin: 0; font-size: 14px; }
+  .callout.info { background: var(--accent-bg); border-color: var(--accent-bd); color: #1e40af; }
+  .callout.tip  { background: var(--green-bg); border-color: #bbf7d0; color: #166534; }
+  .callout.warn { background: var(--amber-bg); border-color: #fde68a; color: #92400e; }
+
+  /* ── Tables ─────────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; margin: 20px 0; border-radius: var(--radius-lg); border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead { background: var(--surface-2); }
+  th { text-align: left; padding: 10px 14px; font-weight: 600; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid var(--border); }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--border-soft); color: var(--text-2); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg); }
+  td code { font-size: 12px; }
+
+  /* ── Feature grid ───────────────────────────────────────── */
+  .feature-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; margin: 24px 0; }
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 20px 22px;
+  }
+  .feature-icon {
+    width: 34px; height: 34px; border-radius: 9px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 17px;
+  }
+  .feature-card h4 { font-size: 14.5px; font-weight: 600; margin: 0 0 6px; color: var(--text); }
+  .feature-card p { font-size: 13.5px; color: var(--text-3); margin: 0; line-height: 1.55; }
+  .fi-blue   { background: var(--accent-bg); }
+  .fi-green  { background: var(--green-bg); }
+  .fi-purple { background: var(--purple-bg); }
+  .fi-amber  { background: var(--amber-bg); }
+
+  /* ── Inline badges ──────────────────────────────────────── */
+  .badge {
+    display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
+    padding: 2px 7px; border-radius: 5px; vertical-align: middle; margin-left: 4px;
+  }
+  .badge-blue   { background: var(--accent-bg); color: var(--accent); }
+  .badge-green  { background: var(--green-bg);  color: var(--green); }
+  .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); }
+
+  /* ── Pipeline diagram ───────────────────────────────────── */
+  .pipeline {
+    display: flex; align-items: center; gap: 0;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    overflow: hidden; margin: 24px 0;
+  }
+  .pipeline-step {
+    flex: 1; padding: 14px 10px; text-align: center; border-right: 1px solid var(--border);
+    position: relative;
+  }
+  .pipeline-step:last-child { border-right: none; }
+  .pipeline-step-num {
+    font-size: 11px; font-weight: 600; color: var(--text-4); letter-spacing: 0.06em; margin-bottom: 4px;
+  }
+  .pipeline-step-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .pipeline-step-desc { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+  .pipeline-step.hi { background: var(--accent-bg); }
+  .pipeline-step.hi .pipeline-step-name { color: var(--accent); }
+
+  /* ── Dialect badges ─────────────────────────────────────── */
+  .dialect-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+  .dialect-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--border); border-radius: 20px;
+    padding: 5px 14px; font-size: 13px; font-weight: 500; color: var(--text-2);
+    background: var(--surface);
+  }
+  .dialect-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .d-pg  { background: #336791; }
+  .d-my  { background: #f29111; }
+  .d-sq  { background: #155e7a; }
+  .d-ms  { background: #cc2927; }
+
+  /* ── Section divider ────────────────────────────────────── */
+  .divider { height: 1px; background: var(--border); margin: 56px 0; }
+
+  /* ── Step list ──────────────────────────────────────────── */
+  .step-list { counter-reset: step; list-style: none; margin: 20px 0; }
+  .step-list li {
+    counter-increment: step; padding: 0 0 28px 48px; position: relative;
+  }
+  .step-list li::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 0;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-bg); border: 1px solid var(--accent-bd);
+    color: var(--accent); font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-list li::after {
+    content: ''; position: absolute; left: 13px; top: 28px; bottom: 0;
+    width: 1px; background: var(--border);
+  }
+  .step-list li:last-child::after { display: none; }
+  .step-list li strong { display: block; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+  .step-list li p { margin: 0; font-size: 14px; }
+
+  /* ── Tag inline ─────────────────────────────────────────── */
+  .tag { font-family: var(--mono); font-size: 12px; color: var(--text-3); background: var(--surface-2); padding: 2px 7px; border-radius: 5px; border: 1px solid var(--border); }
+
+  /* ── Method cards ───────────────────────────────────────── */
+  .method-card {
+    border: 1px solid var(--border); border-radius: var(--radius-lg);
+    margin-bottom: 12px; overflow: hidden;
+  }
+  .method-head {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--surface); padding: 12px 16px; border-bottom: 1px solid var(--border);
+  }
+  .method-verb {
+    font-family: var(--mono); font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+    padding: 2px 8px; border-radius: 5px; flex-shrink: 0;
+  }
+  .method-verb.read   { background: var(--green-bg);  color: var(--green); }
+  .method-verb.write  { background: var(--accent-bg); color: var(--accent); }
+  .method-verb.delete { background: var(--red-bg);    color: var(--red); }
+  .method-verb.util   { background: var(--purple-bg); color: var(--purple); }
+  .method-sig { font-family: var(--mono); font-size: 13px; color: var(--text); }
+  .method-body { padding: 12px 16px; background: var(--bg); }
+  .method-body p { font-size: 13.5px; color: var(--text-2); margin: 0; }
+
+  /* ── Architecture boxes ─────────────────────────────────── */
+  .arch-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin: 24px 0; }
+  .arch-box {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    padding: 16px 18px;
+  }
+  .arch-box h4 { font-size: 13px; font-weight: 700; margin: 0 0 6px; color: var(--text); font-family: var(--mono); }
+  .arch-box p { font-size: 12.5px; color: var(--text-3); margin: 0; line-height: 1.5; }
+
+  /* ── Responsive ─────────────────────────────────────────── */
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .content { padding: 32px 24px 60px; max-width: 100%; }
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .feature-grid { grid-template-columns: 1fr; }
+    .arch-grid { grid-template-columns: 1fr 1fr; }
+    .pipeline { flex-direction: column; }
+    .pipeline-step { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+  @media (max-width: 600px) {
+    .stat-row { grid-template-columns: 1fr; }
+    h1 { font-size: 28px; }
+    .hero h1 { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Topbar ── -->
+<nav class="topbar">
+  <a class="topbar-logo" href="#">
+    <div class="logo-mark">B</div>
+    BreezeORM
+  </a>
+  <span class="topbar-badge">v0.1.0</span>
+  <div class="topbar-right">
+    <a class="topbar-link" href="#quickstart">Quickstart</a>
+    <a class="topbar-link" href="#api">API</a>
+    <a class="topbar-github" href="https://github.com/nelthaarion/breezeorm" target="_blank">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
+  </div>
+</nav>
+
+<!-- ── Layout ── -->
+<div class="layout">
+
+  <!-- ── Sidebar ── -->
+  <aside class="sidebar">
+    <nav>
+      <div class="nav-section">
+        <span class="nav-label">Overview</span>
+        <a class="nav-link active" href="#intro">Introduction</a>
+        <a class="nav-link" href="#quickstart">Quickstart</a>
+        <a class="nav-link" href="#how-it-works">How it works</a>
+      </div>
+      <div class="nav-section">
+        <span class="nav-label">Core API</span>
+        <a class="nav-link" href="#model">Model &amp; Query</a>
+        <a class="nav-link" href="#where">Where &amp; Expressions</a>
+        <a class="nav-link" href="#reads">Read operations</a>
+        <a class="nav-link" href="#writes">Write operations</a>
+        <a class="nav-link" href="#joins">Joins</a>
+        <a class="nav-link" href="#preload">Preload (relations)</a>
+        <a class="nav-link" href="#pagination">Pagination</a>
+        <a class="nav-link" href="#transactions">Transactions</a>
+      </div>
+      <div class="nav-section">
+        <span class="nav-label">Features</span>
+        <a class="nav-link" href="#metadata">Struct tags</a>
+        <a class="nav-link" href="#validation">Validation</a>
+        <a class="nav-link" href="#hooks">Lifecycle hooks</a>
+        <a class="nav-link" href="#plugins">Plugins</a>
+        <a class="nav-link" href="#migrations">Migrations</a>
+        <a class="nav-link" href="#dialects">Dialects</a>
+      </div>
+      <div class="nav-section">
+        <span class="nav-label">Internals</span>
+        <a class="nav-link" href="#caching">Caching &amp; performance</a>
+        <a class="nav-link" href="#scanner">Scanner &amp; codegen</a>
+        <a class="nav-link" href="#packages">Package map</a>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ── Main content ── -->
+  <main class="content">
+
+    <!-- ── Hero ── -->
+    <div class="hero section" id="intro">
+      <div class="hero-eyebrow">Go ORM · Zero driver deps · Compile-once</div>
+      <h1>BreezeORM</h1>
+      <p class="hero-sub">A fast, generic, strongly-typed ORM for Go that compiles query plans once and executes them forever — built for high-throughput services where every allocation counts.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#quickstart">Get started →</a>
+        <a class="btn-secondary" href="https://github.com/nelthaarion/breezeorm" target="_blank">View source</a>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-num stat-accent">2000</div>
+          <div class="stat-label">Compiled plan cache (default)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num stat-green">0</div>
+          <div class="stat-label">Driver dependencies — bring your own</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num stat-accent">4</div>
+          <div class="stat-label">SQL dialects supported</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Quickstart ── -->
+    <section class="section" id="quickstart">
+      <h2>Quickstart</h2>
+      <p>BreezeORM wraps any <code>*sql.DB</code>. Import a driver separately — the ORM itself has zero driver dependencies by design.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>go.mod</div>
+        <pre><code><span class="k">require</span> <span class="s">github.com/nelthaarion/breezeorm</span> <span class="str">v0.1.0</span></code></pre>
+      </div>
+
+      <ol class="step-list">
+        <li>
+          <strong>Define a model with struct tags</strong>
+          <p>Tags drive the metadata compiler — table name, primary key, autoincrement, unique indexes, defaults, and validation rules.</p>
+        </li>
+        <li>
+          <strong>Open a DB handle</strong>
+          <p>Call <code>orm.Open(sqlDB, dialect.Postgres{})</code>. Pass your existing <code>*sql.DB</code> — BreezeORM is a thin layer on top of the standard library.</p>
+        </li>
+        <li>
+          <strong>Query with <code>orm.Model[T](db)</code></strong>
+          <p>The generic entry point returns a branching, immutable query builder. Chain <code>Where</code>, <code>OrderBy</code>, <code>Limit</code>, and terminate with <code>Find</code>, <code>First</code>, <code>Create</code>, etc.</p>
+        </li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>main.go</div>
+        <pre><code><span class="k">import</span> (
+    <span class="str">"database/sql"</span>
+    <span class="str">"context"</span>
+    _ <span class="str">"github.com/lib/pq"</span>        <span class="cm">// your driver</span>
+    <span class="str">"github.com/nelthaarion/breezeorm/pkg/orm"</span>
+    <span class="str">"github.com/nelthaarion/breezeorm/pkg/dialect"</span>
+    <span class="str">"github.com/nelthaarion/breezeorm/pkg/query"</span>
+)
+
+<span class="cm">// 1 · Model definition</span>
+<span class="k">type</span> <span class="t">User</span> <span class="k">struct</span> {
+    ID        <span class="kw">int64</span>     <span class="str">`db:"id,pk,autoincrement"`</span>
+    Email     <span class="kw">string</span>    <span class="str">`db:"email,unique" validate:"required,email"`</span>
+    Name      <span class="kw">string</span>    <span class="str">`db:"name"         validate:"required,min=2,max=100"`</span>
+    Active    <span class="kw">bool</span>      <span class="str">`db:"active,default=true"`</span>
+    CreatedAt time.Time <span class="str">`db:"created_at"`</span>
+}
+
+<span class="k">func</span> <span class="fn">main</span>() {
+    <span class="cm">// 2 · Open</span>
+    sqlDB, _ := sql.<span class="fn">Open</span>(<span class="str">"postgres"</span>, <span class="str">"postgres://user:pass@localhost/mydb"</span>)
+    db := orm.<span class="fn">Open</span>(sqlDB, dialect.<span class="t">Postgres</span>{})
+    <span class="k">defer</span> db.<span class="fn">Close</span>()
+
+    ctx := context.<span class="fn">Background</span>()
+
+    <span class="cm">// 3 · Query</span>
+    users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+        <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"active"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="kw">true</span>}).
+        <span class="fn">OrderBy</span>(query.<span class="t">OrderTerm</span>{Column: <span class="str">"created_at"</span>, Desc: <span class="kw">true</span>}).
+        <span class="fn">Limit</span>(20).
+        <span class="fn">Find</span>(ctx)
+
+    <span class="cm">// 4 · Insert</span>
+    u := &amp;<span class="t">User</span>{Email: <span class="str">"alice@example.com"</span>, Name: <span class="str">"Alice"</span>, Active: <span class="kw">true</span>}
+    err = orm.<span class="fn">Model</span>[<span class="t">User</span>](db).<span class="fn">Create</span>(ctx, u)
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- ── How it works ── -->
+    <section class="section" id="how-it-works">
+      <h2>How it works</h2>
+      <p>Every call to <code>Find</code>, <code>First</code>, <code>Create</code>, etc. runs the same pipeline. The key insight: <strong>the compile stage runs only once per unique query shape</strong> and the result is cached in a sharded LRU.</p>
+
+      <div class="pipeline">
+        <div class="pipeline-step">
+          <div class="pipeline-step-num">01</div>
+          <div class="pipeline-step-name">Builder</div>
+          <div class="pipeline-step-desc">Immutable fluent AST</div>
+        </div>
+        <div class="pipeline-step hi">
+          <div class="pipeline-step-num">02</div>
+          <div class="pipeline-step-name">PreHash → Cache</div>
+          <div class="pipeline-step-desc">Structural key, skip compile on hit</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-num">03</div>
+          <div class="pipeline-step-name">Planner</div>
+          <div class="pipeline-step-desc">Logical → physical plan</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-num">04</div>
+          <div class="pipeline-step-name">Optimizer</div>
+          <div class="pipeline-step-desc">Predicate push-down, reorder</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-num">05</div>
+          <div class="pipeline-step-name">SQL gen</div>
+          <div class="pipeline-step-desc">Dialect-aware text + args</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-num">06</div>
+          <div class="pipeline-step-name">Execute</div>
+          <div class="pipeline-step-desc">Prepared stmt cache</div>
+        </div>
+        <div class="pipeline-step">
+          <div class="pipeline-step-num">07</div>
+          <div class="pipeline-step-name">Scanner</div>
+          <div class="pipeline-step-desc">Offset-based, zero reflect</div>
+        </div>
+      </div>
+
+      <div class="callout info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <strong>Compile once, execute forever</strong>
+          <p>Steps 03–05 are expensive. BreezeORM skips them on every call for a seen query shape — only args change. The plan cache is sharded to avoid lock contention under concurrent load.</p>
+        </div>
+      </div>
+
+      <div class="arch-grid">
+        <div class="arch-box">
+          <h4>pkg/orm</h4>
+          <p>Public API surface. <code>DB</code>, <code>Query[T]</code>, <code>Model[T]</code> — the only package most users ever import.</p>
+        </div>
+        <div class="arch-box">
+          <h4>pkg/compiler</h4>
+          <p>Runs the logical → physical pipeline. <code>PreHash</code> produces the structural cache key in one pass over the builder.</p>
+        </div>
+        <div class="arch-box">
+          <h4>pkg/execution</h4>
+          <p>Prepared statement pool, bulk insert, SQL generation, retry on transient errors.</p>
+        </div>
+        <div class="arch-box">
+          <h4>pkg/scanner</h4>
+          <p>Maps result columns to struct fields via precomputed byte offsets — no <code>reflect.FieldByIndex</code> on the hot path.</p>
+        </div>
+        <div class="arch-box">
+          <h4>pkg/cache</h4>
+          <p>Sharded LRU for compiled plans and scan plans. <code>GetOrCompute</code> coalesces concurrent first-time compiles.</p>
+        </div>
+        <div class="arch-box">
+          <h4>pkg/dialect</h4>
+          <p>Postgres, MySQL, SQLite, SQL Server — one interface, four implementations. Swap at <code>orm.Open</code> time.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Model & Query ── -->
+    <section class="section" id="model">
+      <h2>Model &amp; Query</h2>
+      <p><code>orm.Model[T](db)</code> is the entry point for every operation. It returns a <code>*Query[T]</code> — an immutable, branchable query builder backed by your model's compiled metadata.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Branching is safe and free</div>
+        <pre><code><span class="cm">// base is a reusable query — its internal builder is a value type,</span>
+<span class="cm">// so branches never share mutable state.</span>
+base := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"active"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="kw">true</span>})
+
+admins := base.<span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"role"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="str">"admin"</span>})
+recent := base.<span class="fn">OrderBy</span>(query.<span class="t">OrderTerm</span>{Column: <span class="str">"created_at"</span>, Desc: <span class="kw">true</span>}).<span class="fn">Limit</span>(10)
+<span class="cm">// base is untouched; admins and recent are independent queries</span></code></pre>
+      </div>
+
+      <h3>Opening a DB</h3>
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>orm.Open</div>
+        <pre><code>db := orm.<span class="fn">Open</span>(
+    sqlDB,
+    dialect.<span class="t">Postgres</span>{},
+    orm.<span class="fn">WithPlugins</span>(plugins.<span class="fn">NewSoftDelete</span>(<span class="str">"deleted_at"</span>)),
+    orm.<span class="fn">WithCompiledQueryCacheSize</span>(4000),
+    orm.<span class="fn">WithScanPlanCacheSize</span>(4000),
+    orm.<span class="fn">WithExecutorOptions</span>(
+        execution.<span class="fn">WithStmtCacheSize</span>(512),
+        execution.<span class="fn">WithDefaultTimeout</span>(5*time.<span class="t">Second</span>),
+    ),
+)
+<span class="k">defer</span> db.<span class="fn">Close</span>()</code></pre>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>WithCompiledQueryCacheSize(n)</code></td><td>2000</td><td>Max distinct query shapes in the compiled-plan cache. Size for unique shapes, not requests.</td></tr>
+            <tr><td><code>WithScanPlanCacheSize(n)</code></td><td>2000</td><td>Max cached scan plans (column→field mappings).</td></tr>
+            <tr><td><code>WithPlugins(...)</code></td><td>—</td><td>Register plugins that run on every query (SoftDelete, Tracing, etc.).</td></tr>
+            <tr><td><code>WithOptimizerPasses(...)</code></td><td>DefaultPipeline()</td><td>Override the logical plan optimization stages.</td></tr>
+            <tr><td><code>WithExecutorOptions(...)</code></td><td>—</td><td>Tune prepared-statement cache size, default timeout, retry policy.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Where & Expressions ── -->
+    <section class="section" id="where">
+      <h2>Where &amp; Expressions</h2>
+      <p>All predicates are typed AST nodes — no string interpolation, no SQL injection surface. Multiple <code>Where</code> calls are AND-ed together automatically.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Predicates</div>
+        <pre><code><span class="cm">// Comparison operators</span>
+query.<span class="t">Predicate</span>{Column: <span class="str">"age"</span>,     Op: query.<span class="t">OpGte</span>,     Value: 18}
+query.<span class="t">Predicate</span>{Column: <span class="str">"name"</span>,    Op: query.<span class="t">OpLike</span>,    Value: <span class="str">"%alice%"</span>}
+query.<span class="t">Predicate</span>{Column: <span class="str">"email"</span>,   Op: query.<span class="t">OpILike</span>,   Value: <span class="str">"%@example.com"</span>}
+query.<span class="t">Predicate</span>{Column: <span class="str">"role"</span>,    Op: query.<span class="t">OpIn</span>,      Value: []<span class="kw">any</span>{<span class="str">"admin"</span>, <span class="str">"mod"</span>}}
+query.<span class="t">Predicate</span>{Column: <span class="str">"deleted"</span>, Op: query.<span class="t">OpIsNull</span>}
+query.<span class="t">Predicate</span>{Column: <span class="str">"score"</span>,   Op: query.<span class="t">OpBetween</span>, Value: [2]<span class="kw">any</span>{50, 100}}
+
+<span class="cm">// Logical combinators</span>
+query.<span class="fn">And</span>(pred1, pred2, pred3)
+query.<span class="fn">Or</span>(pred1, pred2)
+query.<span class="fn">Not</span>(pred1)
+
+<span class="cm">// Raw SQL escape hatch (named params)</span>
+query.<span class="fn">Raw</span>(<span class="str">"score &gt; :min AND category = :cat"</span>, <span class="str">"min"</span>, 80, <span class="str">"cat"</span>, <span class="str">"premium"</span>)</code></pre>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Op</th><th>SQL</th></tr></thead>
+          <tbody>
+            <tr><td><code>OpEq</code></td><td><code>= $1</code></td></tr>
+            <tr><td><code>OpNeq</code></td><td><code>&lt;&gt; $1</code></td></tr>
+            <tr><td><code>OpLt / OpLte / OpGt / OpGte</code></td><td><code>&lt; &lt;= &gt; &gt;=</code></td></tr>
+            <tr><td><code>OpLike / OpILike</code></td><td><code>LIKE / ILIKE $1</code></td></tr>
+            <tr><td><code>OpIn / OpNotIn</code></td><td><code>IN ($1, $2…)</code></td></tr>
+            <tr><td><code>OpIsNull / OpIsNotNull</code></td><td><code>IS NULL / IS NOT NULL</code></td></tr>
+            <tr><td><code>OpBetween</code></td><td><code>BETWEEN $1 AND $2</code></td></tr>
+            <tr><td><code>OpRaw</code></td><td>Literal SQL fragment</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Read operations ── -->
+    <section class="section" id="reads">
+      <h2>Read operations</h2>
+
+      <div class="method-card">
+        <div class="method-head">
+          <span class="method-verb read">READ</span>
+          <span class="method-sig">Find(ctx) ([]T, error)</span>
+        </div>
+        <div class="method-body"><p>Executes the query and returns all matching rows. When a generated fast-scan func is registered for this model, <code>Find</code> dispatches to it — skipping the reflection path entirely.</p></div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-head">
+          <span class="method-verb read">READ</span>
+          <span class="method-sig">First(ctx) (*T, error)</span>
+        </div>
+        <div class="method-body"><p>Implicitly appends <code>LIMIT 1</code> and returns a single row. Returns <code>"orm: no rows found"</code> when nothing matches — never panics on empty results.</p></div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-head">
+          <span class="method-verb read">READ</span>
+          <span class="method-sig">Count(ctx) (int64, error)</span>
+        </div>
+        <div class="method-body"><p>Rewrites the projection to <code>COUNT(*)</code> and returns the count. Respects the current <code>Where</code> clause.</p></div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-head">
+          <span class="method-verb read">READ</span>
+          <span class="method-sig">Exists(ctx) (bool, error)</span>
+        </div>
+        <div class="method-body"><p>Returns whether any row matches. Implemented as <code>Limit(1).Count(ctx) &gt; 0</code>.</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Examples</div>
+        <pre><code><span class="cm">// All active users, newest first</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"active"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="kw">true</span>}).
+    <span class="fn">OrderBy</span>(query.<span class="t">OrderTerm</span>{Column: <span class="str">"created_at"</span>, Desc: <span class="kw">true</span>}).
+    <span class="fn">Find</span>(ctx)
+
+<span class="cm">// Single row by ID</span>
+user, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"id"</span>, Op: query.<span class="t">OpEq</span>, Value: 42}).
+    <span class="fn">First</span>(ctx)
+
+<span class="cm">// Count admins</span>
+n, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"role"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="str">"admin"</span>}).
+    <span class="fn">Count</span>(ctx)
+
+<span class="cm">// Select specific columns only</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Select</span>(query.<span class="t">SelectExpr</span>{Expr: <span class="str">"id"</span>}, query.<span class="t">SelectExpr</span>{Expr: <span class="str">"email"</span>}).
+    <span class="fn">Find</span>(ctx)
+
+<span class="cm">// DISTINCT rows</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).<span class="fn">Distinct</span>().<span class="fn">Find</span>(ctx)
+
+<span class="cm">// Pessimistic lock (SELECT … FOR UPDATE)</span>
+user, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"id"</span>, Op: query.<span class="t">OpEq</span>, Value: 1}).
+    <span class="fn">Lock</span>(dialect.<span class="t">LockForUpdate</span>).
+    <span class="fn">First</span>(ctx)</code></pre>
+      </div>
+    </section>
+
+    <!-- ── Write operations ── -->
+    <section class="section" id="writes">
+      <h2>Write operations</h2>
+
+      <div class="method-card">
+        <div class="method-head">
+          <span class="method-verb write">WRITE</span>
+          <span class="method-sig">Create(ctx, *T) error</span>
+        </div>
+        <div class="method-body"><p>Inserts one row. Fires <code>BeforeCreate</code> / <code>AfterCreate</code> hooks if the model implements them. Populates auto-generated fields (e.g. <code>id</code>) back onto the struct when the dialect supports <code>RETURNING</code>.</p></div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-head">
+          <span class="method-verb write">WRITE</span>
+          <span class="method-sig">CreateBatch(ctx, []T) (int64, error)</span>
+        </div>
+        <div class="method-body"><p>Inserts many rows using multi-row <code>INSERT</code> statements. Input larger than the max bulk size is automatically chunked, all within a single transaction. Returns the total number of affected rows.</p></div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-head">
+          <span class="method-verb write">WRITE</span>
+          <span class="method-sig">UpdateAll(ctx, ...Assignment) (int64, error)</span>
+        </div>
+        <div class="method-body"><p>Updates every row matching the current <code>Where</code> clause. Returns the count of affected rows.</p></div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-head">
+          <span class="method-verb delete">DELETE</span>
+          <span class="method-sig">Delete(ctx) (int64, error)</span>
+        </div>
+        <div class="method-body"><p>Deletes every row matching the current <code>Where</code> clause. When a SoftDelete plugin is registered, this rewrites to an <code>UPDATE SET deleted_at = now()</code> instead.</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Examples</div>
+        <pre><code><span class="cm">// Single insert</span>
+u := &amp;<span class="t">User</span>{Email: <span class="str">"bob@example.com"</span>, Name: <span class="str">"Bob"</span>}
+err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).<span class="fn">Create</span>(ctx, u)
+
+<span class="cm">// Batch insert — one transaction, multi-row VALUES</span>
+users := []<span class="t">User</span>{{Name: <span class="str">"Alice"</span>}, {Name: <span class="str">"Bob"</span>}, {Name: <span class="str">"Carol"</span>}}
+n, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).<span class="fn">CreateBatch</span>(ctx, users)
+
+<span class="cm">// Update — target specific rows</span>
+n, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"id"</span>, Op: query.<span class="t">OpEq</span>, Value: 42}).
+    <span class="fn">UpdateAll</span>(ctx,
+        query.<span class="t">Assignment</span>{Column: <span class="str">"name"</span>,   Value: <span class="str">"Alice Updated"</span>},
+        query.<span class="t">Assignment</span>{Column: <span class="str">"active"</span>, Value: <span class="kw">false</span>},
+    )
+
+<span class="cm">// Delete</span>
+n, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"active"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="kw">false</span>}).
+    <span class="fn">Delete</span>(ctx)</code></pre>
+      </div>
+    </section>
+
+    <!-- ── Joins ── -->
+    <section class="section" id="joins">
+      <h2>Joins</h2>
+      <p>All join types are supported. The condition is an <code>Expr</code>, so you get the same type-safe predicate system as <code>Where</code>.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Join types</div>
+        <pre><code>q := orm.<span class="fn">Model</span>[<span class="t">User</span>](db)
+
+<span class="cm">// INNER JOIN</span>
+q = q.<span class="fn">InnerJoin</span>(<span class="str">"orders"</span>, <span class="str">"o"</span>,
+    query.<span class="t">Predicate</span>{Column: <span class="str">"o.user_id"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="str">"users.id"</span>})
+
+<span class="cm">// LEFT JOIN</span>
+q = q.<span class="fn">LeftJoin</span>(<span class="str">"profiles"</span>, <span class="str">"p"</span>,
+    query.<span class="t">Predicate</span>{Column: <span class="str">"p.user_id"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="str">"users.id"</span>})
+
+<span class="cm">// RIGHT / FULL / CROSS</span>
+q = q.<span class="fn">RightJoin</span>(<span class="str">"departments"</span>, <span class="str">"d"</span>, on)
+q = q.<span class="fn">FullJoin</span>(<span class="str">"audit_log"</span>,   <span class="str">"a"</span>, on)
+q = q.<span class="fn">CrossJoin</span>(<span class="str">"tags"</span>,         <span class="str">"t"</span>)</code></pre>
+      </div>
+    </section>
+
+    <!-- ── Preload ── -->
+    <section class="section" id="preload">
+      <h2>Preload (relations)</h2>
+      <p>BreezeORM supports eager loading via <code>Preload</code>. Nested paths use dot notation. Conditional preloads scope the related query with a <code>Where</code> clause. Batch mode avoids N+1 with a single <code>WHERE IN</code> query.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Preload examples</div>
+        <pre><code><span class="cm">// Simple: load User.Posts</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Preload</span>(<span class="str">"Posts"</span>).
+    <span class="fn">Find</span>(ctx)
+
+<span class="cm">// Nested: User.Posts.Comments</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Preload</span>(<span class="str">"Posts.Comments"</span>).
+    <span class="fn">Find</span>(ctx)
+
+<span class="cm">// Conditional: only published posts</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Preload</span>(<span class="str">"Posts"</span>,
+        query.<span class="fn">WithPreloadWhere</span>(
+            query.<span class="t">Predicate</span>{Column: <span class="str">"published"</span>, Op: query.<span class="t">OpEq</span>, Value: <span class="kw">true</span>},
+        ),
+        query.<span class="fn">WithPreloadLimit</span>(10),
+    ).
+    <span class="fn">Find</span>(ctx)
+
+<span class="cm">// Batch mode: single WHERE IN instead of per-row query</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Preload</span>(<span class="str">"Posts"</span>, query.<span class="fn">WithBatchPreload</span>()).
+    <span class="fn">Find</span>(ctx)</code></pre>
+      </div>
+    </section>
+
+    <!-- ── Pagination ── -->
+    <section class="section" id="pagination">
+      <h2>Pagination</h2>
+      <p>Two pagination strategies: classic offset-based and cursor-based keyset pagination.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Offset pagination</div>
+        <pre><code><span class="cm">// Page 3, 20 items per page — equivalent to LIMIT 20 OFFSET 40</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">OrderBy</span>(query.<span class="t">OrderTerm</span>{Column: <span class="str">"id"</span>}).
+    <span class="fn">Page</span>(3, 20).
+    <span class="fn">Find</span>(ctx)
+
+<span class="cm">// Or manually</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">Limit</span>(20).<span class="fn">Offset</span>(40).<span class="fn">Find</span>(ctx)</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Cursor pagination</div>
+        <pre><code><span class="cm">// After(cursor) translates to a keyset WHERE clause</span>
+<span class="cm">// based on the current OrderBy terms — stable under inserts.</span>
+users, err := orm.<span class="fn">Model</span>[<span class="t">User</span>](db).
+    <span class="fn">OrderBy</span>(query.<span class="t">OrderTerm</span>{Column: <span class="str">"created_at"</span>, Desc: <span class="kw">true</span>}).
+    <span class="fn">Limit</span>(20).
+    <span class="fn">After</span>(lastSeenCursor).
+    <span class="fn">Find</span>(ctx)</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">✓</div>
+        <div class="callout-body">
+          <strong>Cursor vs. offset</strong>
+          <p>Prefer cursor pagination for feeds and real-time data. Offset pagination skips rows when new items are inserted during traversal. Cursor pagination is stable because it uses a <code>WHERE id &gt; last_id</code> keyset predicate.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Transactions ── -->
+    <section class="section" id="transactions">
+      <h2>Transactions</h2>
+      <p>BreezeORM provides context-aware transactions with nested savepoint support and automatic retry on transient failures (deadlocks, serialization errors, SQLite busy).</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>transaction.Run</div>
+        <pre><code>err := transaction.<span class="fn">Run</span>(ctx, db.<span class="fn">SQLDB</span>(), <span class="kw">nil</span>, transaction.<span class="fn">DefaultRetryPolicy</span>(),
+    <span class="k">func</span>(txCtx context.<span class="t">Context</span>) <span class="kw">error</span> {
+        <span class="cm">// Any ORM call here reuses the transaction from txCtx.</span>
+        if err := orm.<span class="fn">Model</span>[<span class="t">Order</span>](db).<span class="fn">Create</span>(txCtx, order); err != nil {
+            <span class="k">return</span> err <span class="cm">// triggers automatic rollback</span>
+        }
+        _, err := orm.<span class="fn">Model</span>[<span class="t">Inventory</span>](db).
+            <span class="fn">Where</span>(query.<span class="t">Predicate</span>{Column: <span class="str">"sku"</span>, Op: query.<span class="t">OpEq</span>, Value: order.SKU}).
+            <span class="fn">UpdateAll</span>(txCtx, query.<span class="t">Assignment</span>{Column: <span class="str">"stock"</span>, Value: newStock})
+        <span class="k">return</span> err
+    })
+
+<span class="cm">// Nested transaction — becomes a SAVEPOINT automatically</span>
+err = transaction.<span class="fn">Run</span>(txCtx, db.<span class="fn">SQLDB</span>(), <span class="kw">nil</span>, transaction.<span class="fn">DefaultRetryPolicy</span>(),
+    <span class="k">func</span>(innerCtx context.<span class="t">Context</span>) <span class="kw">error</span> {
+        <span class="cm">// Runs as SAVEPOINT sp_1 inside the outer transaction</span>
+        <span class="k">return</span> orm.<span class="fn">Model</span>[<span class="t">AuditLog</span>](db).<span class="fn">Create</span>(innerCtx, log)
+    })</code></pre>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>RetryPolicy field</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>MaxAttempts</code></td><td>3</td><td>Total attempts including the first.</td></tr>
+            <tr><td><code>BaseDelay</code></td><td>10ms</td><td>Initial backoff; doubles with each retry.</td></tr>
+            <tr><td><code>MaxDelay</code></td><td>500ms</td><td>Cap on the exponential backoff.</td></tr>
+            <tr><td><code>IsRetryable</code></td><td>built-in heuristic</td><td>Classifies an error as transient. Matches deadlock, serialization failure, lock wait timeout, SQLite busy across all dialects.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Metadata / struct tags ── -->
+    <section class="section" id="metadata">
+      <h2>Struct tags</h2>
+      <p>The <code>db</code> tag drives the metadata compiler. The <code>validate</code> tag is consumed by the validation engine, optionally wired through <code>BeforeSave</code>.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Full tag example</div>
+        <pre><code><span class="k">type</span> <span class="t">Product</span> <span class="k">struct</span> {
+    ID          <span class="kw">int64</span>      <span class="str">`db:"id,pk,autoincrement"`</span>
+    SKU         <span class="kw">string</span>     <span class="str">`db:"sku,unique"            validate:"required"`</span>
+    Name        <span class="kw">string</span>     <span class="str">`db:"name"                  validate:"required,min=2,max=200"`</span>
+    Price       <span class="kw">float64</span>    <span class="str">`db:"price"                 validate:"min=0"`</span>
+    Category    <span class="kw">string</span>     <span class="str">`db:"category"              validate:"required"`</span>
+    InStock     <span class="kw">bool</span>       <span class="str">`db:"in_stock,default=true"`</span>
+    Description <span class="kw">string</span>     <span class="str">`db:"description"           validate:"max=2000"`</span>
+    CreatedAt   time.<span class="t">Time</span>  <span class="str">`db:"created_at,generated"`</span>
+    UpdatedAt   time.<span class="t">Time</span>  <span class="str">`db:"updated_at,generated"`</span>
+    DeletedAt   *time.<span class="t">Time</span> <span class="str">`db:"deleted_at"`</span>  <span class="cm">// soft-delete column</span>
+}</code></pre>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tag option</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pk</code></td><td>Marks the primary key column.</td></tr>
+            <tr><td><code>autoincrement</code></td><td>Column is auto-generated on insert — excluded from INSERT values.</td></tr>
+            <tr><td><code>unique</code></td><td>Marks the column for a unique index (used in migration diffing).</td></tr>
+            <tr><td><code>default=…</code></td><td>Default value, applied in migrations and documented in metadata.</td></tr>
+            <tr><td><code>generated</code></td><td>Server-generated column (e.g. <code>created_at DEFAULT NOW()</code>) — excluded from INSERT/UPDATE.</td></tr>
+            <tr><td><code>-</code></td><td>Excludes the field from all ORM operations.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Validation ── -->
+    <section class="section" id="validation">
+      <h2>Validation</h2>
+      <p>Tag-driven field validation. Call <code>validation.Validate(model)</code> directly, or wire it into <code>BeforeSave</code> / <code>BeforeCreate</code> hooks.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Rules</div>
+        <pre><code><span class="k">type</span> <span class="t">User</span> <span class="k">struct</span> {
+    Email    <span class="kw">string</span> <span class="str">`validate:"required,email"`</span>
+    Name     <span class="kw">string</span> <span class="str">`validate:"required,min=2,max=100"`</span>
+    Age      <span class="kw">int</span>    <span class="str">`validate:"min=0,max=150"`</span>
+    Website  <span class="kw">string</span> <span class="str">`validate:"url"`</span>
+    UUID     <span class="kw">string</span> <span class="str">`validate:"uuid"`</span>
+    Slug     <span class="kw">string</span> <span class="str">`validate:"regex=^[a-z0-9-]+$"`</span>
+    Category <span class="kw">string</span> <span class="str">`validate:"custom=allowed_category"`</span>
+}
+
+<span class="cm">// Register a custom validator</span>
+validation.<span class="fn">RegisterCustom</span>(<span class="str">"allowed_category"</span>, <span class="k">func</span>(v <span class="kw">any</span>) <span class="kw">error</span> {
+    allowed := map[<span class="kw">string</span>]<span class="kw">bool</span>{<span class="str">"tech"</span>: <span class="kw">true</span>, <span class="str">"finance"</span>: <span class="kw">true</span>}
+    if !allowed[fmt.<span class="fn">Sprint</span>(v)] {
+        <span class="k">return</span> fmt.<span class="fn">Errorf</span>(<span class="str">"invalid category"</span>)
+    }
+    <span class="k">return</span> <span class="kw">nil</span>
+})
+
+<span class="cm">// Validate returns *ValidationError with a map of field→error</span>
+if err := validation.<span class="fn">Validate</span>(&amp;user); err != nil {
+    var ve *validation.<span class="t">ValidationError</span>
+    if errors.<span class="fn">As</span>(err, &amp;ve) {
+        <span class="k">for</span> field, e := <span class="k">range</span> ve.Fields {
+            fmt.<span class="fn">Printf</span>(<span class="str">"%s: %v\n"</span>, field, e)
+        }
+    }
+}</code></pre>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Rule</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>required</code></td><td>Field must be non-zero.</td></tr>
+            <tr><td><code>min=N</code></td><td>Numeric: value ≥ N. String: length ≥ N characters.</td></tr>
+            <tr><td><code>max=N</code></td><td>Numeric: value ≤ N. String: length ≤ N characters.</td></tr>
+            <tr><td><code>email</code></td><td>Valid RFC 5322 email address.</td></tr>
+            <tr><td><code>url</code></td><td>Valid absolute URL with scheme.</td></tr>
+            <tr><td><code>uuid</code></td><td>Standard UUID format (<code>xxxxxxxx-xxxx-…</code>).</td></tr>
+            <tr><td><code>regex=pattern</code></td><td>Must match the compiled regex. Pattern is cached.</td></tr>
+            <tr><td><code>custom=name</code></td><td>Calls a function registered with <code>validation.RegisterCustom</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Hooks ── -->
+    <section class="section" id="hooks">
+      <h2>Lifecycle hooks</h2>
+      <p>Implement any hook interface on your model struct. BreezeORM checks for them via a single type assertion — zero cost when the model doesn't implement a hook.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Hook interfaces</div>
+        <pre><code><span class="cm">// Implement any combination of these on your model:</span>
+<span class="k">type</span> <span class="t">BeforeCreate</span> <span class="k">interface</span> { <span class="fn">BeforeCreate</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> }
+<span class="k">type</span> <span class="t">AfterCreate</span>  <span class="k">interface</span> { <span class="fn">AfterCreate</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> }
+<span class="k">type</span> <span class="t">BeforeUpdate</span> <span class="k">interface</span> { <span class="fn">BeforeUpdate</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> }
+<span class="k">type</span> <span class="t">AfterUpdate</span>  <span class="k">interface</span> { <span class="fn">AfterUpdate</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> }
+<span class="k">type</span> <span class="t">BeforeDelete</span> <span class="k">interface</span> { <span class="fn">BeforeDelete</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> }
+<span class="k">type</span> <span class="t">AfterDelete</span>  <span class="k">interface</span> { <span class="fn">AfterDelete</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> }
+<span class="k">type</span> <span class="t">BeforeSave</span>   <span class="k">interface</span> { <span class="fn">BeforeSave</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> }
+<span class="k">type</span> <span class="t">AfterSave</span>    <span class="k">interface</span> { <span class="fn">AfterSave</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> }
+
+<span class="cm">// Example: hash password before create</span>
+<span class="k">func</span> (u *<span class="t">User</span>) <span class="fn">BeforeCreate</span>(ctx context.<span class="t">Context</span>) <span class="kw">error</span> {
+    hashed, err := bcrypt.<span class="fn">GenerateFromPassword</span>([]<span class="kw">byte</span>(u.Password), 14)
+    if err != nil { <span class="k">return</span> err }
+    u.Password = <span class="kw">string</span>(hashed)
+    u.CreatedAt = time.<span class="fn">Now</span>()
+    <span class="k">return</span> validation.<span class="fn">Validate</span>(u) <span class="cm">// wire validation here</span>
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- ── Plugins ── -->
+    <section class="section" id="plugins">
+      <h2>Plugins</h2>
+      <p>Plugins hook into query compilation and execution. When no plugins are registered, the cost is a single <code>len(chain) == 0</code> check — zero overhead on the benchmark path.</p>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon fi-blue">🗑️</div>
+          <h4>SoftDelete</h4>
+          <p>Injects <code>WHERE deleted_at IS NULL</code> into every query automatically. <code>Delete</code> rewrites to <code>UPDATE SET deleted_at = now()</code>.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon fi-purple">🔒</div>
+          <h4>MultiTenancy</h4>
+          <p>Per-request plugin that injects a tenant predicate. Plan cache is bypassed for request-scoped plugins — no cross-tenant data leaks.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon fi-green">📊</div>
+          <h4>Metrics / Tracing</h4>
+          <p><code>BeforeExecute</code> / <code>AfterExecute</code> hooks give you SQL text, args, and wall-clock duration for every query. Wire OpenTelemetry here.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon fi-amber">📋</div>
+          <h4>Auditing</h4>
+          <p>Observe every write. <code>AfterExecute</code> receives the SQL, args, duration, and error — enough to build a complete audit trail.</p>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Custom plugin</div>
+        <pre><code><span class="k">type</span> <span class="t">QueryLogger</span> <span class="k">struct</span>{ plugins.<span class="t">NoopPlugin</span> }
+
+<span class="k">func</span> (<span class="t">QueryLogger</span>) <span class="fn">Name</span>() <span class="kw">string</span> { <span class="k">return</span> <span class="str">"query_logger"</span> }
+
+<span class="k">func</span> (<span class="t">QueryLogger</span>) <span class="fn">AfterExecute</span>(_ context.<span class="t">Context</span>, sql <span class="kw">string</span>, ns <span class="kw">int64</span>, err <span class="kw">error</span>) {
+    log.<span class="fn">Printf</span>(<span class="str">"[sql] %s | %dµs | err=%v"</span>, sql, ns/1000, err)
+}
+
+db := orm.<span class="fn">Open</span>(sqlDB, dialect.<span class="t">Postgres</span>{},
+    orm.<span class="fn">WithPlugins</span>(
+        plugins.<span class="fn">NewSoftDelete</span>(<span class="str">"deleted_at"</span>),
+        <span class="t">QueryLogger</span>{},
+    ),
+)</code></pre>
+      </div>
+
+      <div class="callout warn">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <strong>Request-scoped plugins bypass the plan cache</strong>
+          <p>Plugins that implement <code>IsRequestScoped() bool</code> returning <code>true</code> cause <code>compileCached</code> to skip the compiled-plan cache entirely. This is correct and intentional — a plan baked with one tenant's predicate must never be served to another. Only implement this for plugins whose <code>BeforePlan</code> output changes per-request.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Migrations ── -->
+    <section class="section" id="migrations">
+      <h2>Migrations</h2>
+      <p>BreezeORM ships a version-table based migration engine. Migrations are Go functions — no DSL files, no external tooling required.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>migrations/main.go</div>
+        <pre><code>m := migrations.<span class="fn">New</span>(sqlDB, <span class="str">"schema_migrations"</span>)
+
+m.<span class="fn">Register</span>(
+    migrations.<span class="t">Migration</span>{
+        Version: <span class="str">"20260701000000"</span>,
+        Name:    <span class="str">"create_users"</span>,
+        Up: <span class="k">func</span>(ctx context.<span class="t">Context</span>, tx *sql.<span class="t">Tx</span>) <span class="kw">error</span> {
+            _, err := tx.<span class="fn">ExecContext</span>(ctx, <span class="str">`
+                CREATE TABLE users (
+                    id         BIGSERIAL PRIMARY KEY,
+                    email      TEXT UNIQUE NOT NULL,
+                    name       TEXT NOT NULL,
+                    active     BOOLEAN NOT NULL DEFAULT true,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                )`</span>)
+            <span class="k">return</span> err
+        },
+        Down: <span class="k">func</span>(ctx context.<span class="t">Context</span>, tx *sql.<span class="t">Tx</span>) <span class="kw">error</span> {
+            _, err := tx.<span class="fn">ExecContext</span>(ctx, <span class="str">"DROP TABLE IF EXISTS users"</span>)
+            <span class="k">return</span> err
+        },
+        Seed: <span class="k">func</span>(ctx context.<span class="t">Context</span>, tx *sql.<span class="t">Tx</span>) <span class="kw">error</span> {
+            _, err := tx.<span class="fn">ExecContext</span>(ctx,
+                <span class="str">"INSERT INTO users (email, name) VALUES ($1, $2)"</span>,
+                <span class="str">"admin@example.com"</span>, <span class="str">"Admin"</span>,
+            )
+            <span class="k">return</span> err
+        },
+    },
+)
+
+<span class="cm">// Apply all pending migrations</span>
+err := m.<span class="fn">Up</span>(ctx)
+
+<span class="cm">// Roll back the most recent migration</span>
+err = m.<span class="fn">Down</span>(ctx)</code></pre>
+      </div>
+    </section>
+
+    <!-- ── Dialects ── -->
+    <section class="section" id="dialects">
+      <h2>Dialects</h2>
+      <p>Pass the dialect to <code>orm.Open</code>. The dialect handles quoting, placeholder syntax, upsert syntax, and lock modes.</p>
+
+      <div class="dialect-row">
+        <div class="dialect-pill"><div class="dialect-dot d-pg"></div>Postgres</div>
+        <div class="dialect-pill"><div class="dialect-dot d-my"></div>MySQL / MariaDB</div>
+        <div class="dialect-pill"><div class="dialect-dot d-sq"></div>SQLite</div>
+        <div class="dialect-pill"><div class="dialect-dot d-ms"></div>SQL Server</div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>Dialect selection</div>
+        <pre><code>orm.<span class="fn">Open</span>(sqlDB, dialect.<span class="t">Postgres</span>{})    <span class="cm">// $1 placeholders, RETURNING, ILIKE</span>
+orm.<span class="fn">Open</span>(sqlDB, dialect.<span class="t">MySQL</span>{})       <span class="cm">// ? placeholders, ON DUPLICATE KEY</span>
+orm.<span class="fn">Open</span>(sqlDB, dialect.<span class="t">SQLite</span>{})      <span class="cm">// ? placeholders, WAL-friendly</span>
+orm.<span class="fn">Open</span>(sqlDB, dialect.<span class="t">SQLServer</span>{})  <span class="cm">// @p1 placeholders, TOP N syntax</span></code></pre>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Dialect</th><th>Placeholder</th><th>Upsert</th><th>RETURNING</th><th>Lock</th></tr></thead>
+          <tbody>
+            <tr><td><code>Postgres</code></td><td><code>$1, $2</code></td><td><code>ON CONFLICT DO UPDATE</code></td><td>✓</td><td><code>FOR UPDATE / SHARE</code></td></tr>
+            <tr><td><code>MySQL</code></td><td><code>?</code></td><td><code>ON DUPLICATE KEY UPDATE</code></td><td>—</td><td><code>FOR UPDATE</code></td></tr>
+            <tr><td><code>SQLite</code></td><td><code>?</code></td><td><code>INSERT OR REPLACE</code></td><td>—</td><td>—</td></tr>
+            <tr><td><code>SQLServer</code></td><td><code>@p1</code></td><td><code>MERGE</code></td><td><code>OUTPUT</code></td><td><code>WITH (UPDLOCK)</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Caching & performance ── -->
+    <section class="section" id="caching">
+      <h2>Caching &amp; performance</h2>
+      <p>BreezeORM has three caching layers stacked in the hot path:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cache</th><th>Key</th><th>What it stores</th><th>Default size</th></tr></thead>
+          <tbody>
+            <tr><td>Compiled query cache</td><td><code>PreHash(builder, dialect)</code></td><td>Full logical + optimized + physical plan</td><td>2000 shards</td></tr>
+            <tr><td>Scan plan cache</td><td><code>cq.CacheKey</code></td><td>Column→struct-field offset mapping</td><td>2000 shards</td></tr>
+            <tr><td>Prepared stmt cache</td><td>SQL text</td><td><code>*sql.Stmt</code> handles</td><td>Configurable</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>How PreHash works</h3>
+      <p><code>PreHash</code> computes a structural key from the builder in a single pass — before the planner or optimizer run. It captures the query shape (which tables, which predicates, which columns, limit/offset presence) but not the literal values. Two queries with the same shape but different <code>WHERE id = ?</code> values produce the same hash and share a compiled plan.</p>
+
+      <div class="callout info">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <strong>GetOrCompute prevents thundering-herd</strong>
+          <p>When N goroutines hit a cold cache for the same query shape simultaneously, <code>GetOrCompute</code> coalesces them — only one goroutine runs the compile pipeline. The others wait and receive the same result. Without this, each goroutine would compile independently and waste CPU.</p>
+        </div>
+      </div>
+
+      <h3>Sharded LRU</h3>
+      <p>Both plan caches are sharded. <code>PreHash</code> is already a well-distributed <code>uint64</code>, so shard selection is a single modulo — no re-hashing of query text. Under concurrent load, goroutines working on different query shapes never contend on the same mutex.</p>
+
+      <h3>Scanner performance</h3>
+      <p>The scanner maps result columns to struct fields using precomputed byte offsets from <code>metadata.Compile</code>. On the hot path it does a pointer add per column — no <code>reflect.FieldByIndex</code>, no map lookup. With <code>pkg/scanner/gen</code>, you can generate a typed <code>FastScanFunc[T]</code> that writes directly into <code>rows.Scan</code> pointers, matching hand-written sqlx performance.</p>
+    </section>
+
+    <!-- ── Scanner & codegen ── -->
+    <section class="section" id="scanner">
+      <h2>Scanner &amp; code generation</h2>
+      <p>The default scanner is reflection-free (offset arithmetic). For maximum throughput, you can generate a typed scan function that goes one step further — no type switch, no Plan lookup, direct field pointers.</p>
+
+      <div class="code-block">
+        <div class="code-label"><div class="code-label-dot"></div>pkg/scanner/gen/user_scan.go (generated)</div>
+        <pre><code><span class="cm">// This file is generated — do not edit by hand.</span>
+<span class="k">func</span> <span class="fn">ScanUser</span>(rows scanner.<span class="t">Rows</span>, dest *<span class="t">User</span>) <span class="kw">error</span> {
+    <span class="k">return</span> rows.<span class="fn">Scan</span>(&amp;dest.ID, &amp;dest.Email, &amp;dest.Name, &amp;dest.Active, &amp;dest.CreatedAt)
+}
+
+<span class="k">func</span> <span class="fn">init</span>() {
+    scanner.<span class="fn">RegisterFastScan</span>[<span class="t">User</span>](queryCacheKey, <span class="fn">ScanUser</span>)
+}</code></pre>
+      </div>
+
+      <p>Once registered, <code>Find</code> and <code>First</code> automatically dispatch to the generated function when the cache key matches. The registration check is a map lookup — no reflection, no type switch at all.</p>
+    </section>
+
+    <!-- ── Package map ── -->
+    <section class="section" id="packages">
+      <h2>Package map</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Package</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td><code>pkg/orm</code></td><td>Public API — <code>DB</code>, <code>Query[T]</code>, <code>Model[T]</code>. The only package most applications ever import.</td></tr>
+            <tr><td><code>pkg/query</code></td><td>Immutable builder AST — <code>Builder[T]</code>, <code>Expr</code>, predicates, joins, CTEs.</td></tr>
+            <tr><td><code>pkg/metadata</code></td><td>Compiles struct tags into <code>Table</code> (columns, offsets, relations). Called once per type.</td></tr>
+            <tr><td><code>pkg/compiler</code></td><td>Logical → physical plan compilation. <code>PreHash</code> for cache keying.</td></tr>
+            <tr><td><code>pkg/planner</code></td><td>Logical plan nodes (<code>NodeScan</code>, <code>NodeFilter</code>, <code>NodeLimit</code>, …) and physical plan.</td></tr>
+            <tr><td><code>pkg/optimizer</code></td><td>Rewrite passes over the logical plan: predicate push-down, join reorder, limit push-down.</td></tr>
+            <tr><td><code>pkg/execution</code></td><td>SQL generation, prepared-statement pool, bulk insert, retry, plugin hooks.</td></tr>
+            <tr><td><code>pkg/scanner</code></td><td>Offset-based row scanner, <code>Plan</code> compiler, fast-scan registry.</td></tr>
+            <tr><td><code>pkg/cache</code></td><td>Sharded LRU with <code>GetOrCompute</code> for coalesced first-time compilation.</td></tr>
+            <tr><td><code>pkg/dialect</code></td><td>Postgres, MySQL, SQLite, SQL Server — quoting, placeholders, upsert, locking.</td></tr>
+            <tr><td><code>pkg/transaction</code></td><td>Context-aware transactions, nested savepoints, exponential-backoff retry.</td></tr>
+            <tr><td><code>pkg/plugins</code></td><td>Plugin interface, <code>Chain</code>, <code>NoopPlugin</code>, built-in SoftDelete.</td></tr>
+            <tr><td><code>pkg/hooks</code></td><td>Lifecycle hook interfaces — BeforeCreate, AfterCreate, BeforeSave, etc.</td></tr>
+            <tr><td><code>pkg/validation</code></td><td>Struct-tag validation engine with cached regex and custom validators.</td></tr>
+            <tr><td><code>pkg/relations</code></td><td>HasOne, HasMany, BelongsTo, ManyToMany loaders for preload.</td></tr>
+            <tr><td><code>pkg/migrations</code></td><td>Version-table migration engine with Up/Down/Seed and automatic retry.</td></tr>
+            <tr><td><code>pkg/pool</code></td><td>Generic object pool for internal buffer reuse.</td></tr>
+            <tr><td><code>pkg/xtypes</code></td><td>Extra types — <code>UnixTime</code> for Unix-timestamp columns.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  const links = document.querySelectorAll('.nav-link');
+  const sections = document.querySelectorAll('.section');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector('.nav-link[href="#' + e.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const id = link.getAttribute('href').slice(1);
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script>
+</body>
+</html>
