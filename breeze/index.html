@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Breeze — High-Performance HTTP Framework for Go</title>
@@ -511,6 +513,7 @@
     <a href="#doc-install">Docs</a>
     <a href="#performance">Benchmarks</a>
     <a href="#doc-template">Template Engine</a>
+    <a href="#doc-dash-overview">Dashboard</a>
     <a href="https://github.com/nelthaarion/breeze" class="gh-link" target="_blank">GitHub →</a>
   </nav>
 </header>
@@ -588,6 +591,24 @@
   </div>
 
   <div class="sidebar-group">
+    <div class="sidebar-label">Dashboard <span class="badge" style="background:rgba(124,131,253,.15);color:var(--accent);border:1px solid rgba(124,131,253,.25);padding:.05rem .35rem;border-radius:4px;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;margin-left:.3rem">new</span></div>
+    <ul class="sidebar-list">
+      <li><a href="#doc-dash-overview">Overview</a></li>
+      <li><a href="#doc-dash-setup">Setup &amp; Auth</a></li>
+      <li><a href="#doc-dash-realtime">Real-time Overview</a></li>
+      <li><a href="#doc-dash-routes">Routes Explorer</a></li>
+      <li><a href="#doc-dash-api">API Explorer</a></li>
+      <li><a href="#doc-dash-requests">Live Requests</a></li>
+      <li><a href="#doc-dash-db">Database Browser</a></li>
+      <li><a href="#doc-dash-orm">ORM Query Monitor</a></li>
+      <li><a href="#doc-dash-cache">Cache &amp; Queue</a></li>
+      <li><a href="#doc-dash-logs">Logs</a></li>
+      <li><a href="#doc-dash-health">Health &amp; Runtime</a></li>
+      <li><a href="#doc-dash-timeline">Developer Timeline</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-group">
     <div class="sidebar-label">Advanced</div>
     <ul class="sidebar-list">
       <li><a href="#doc-upload">File Uploads</a></li>
@@ -617,7 +638,7 @@
   </section>
 
   <!-- Features -->
-  <section class="doc-section" id="features">
+  <section class="doc-section reveal visible" id="features">
     <h2 class="section-title">Every decision made for performance.</h2>
     <p class="section-desc">Not another wrapper around net/http. Breeze is built from the ground up on a non-blocking event loop with an obsession over allocations.</p>
     <div class="feature-grid">
@@ -633,21 +654,21 @@
   </section>
 
   <!-- Benchmarks -->
-  <section class="doc-section" id="performance">
+  <section class="doc-section reveal" id="performance">
     <h2 class="section-title">3× faster. Not a typo.</h2>
     <p class="section-desc">Measured on a simple JSON endpoint, same machine, same payload.</p>
     <ul class="bench-list">
-      <li><span class="bench-name">Breeze</span><div class="bench-bar-wrap"><div class="bench-bar" style="width:100%"></div></div><span class="bench-val">~630k req/s</span></li>
-      <li><span class="bench-name">Fiber</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width:33%"></div></div><span class="bench-val">~210k req/s</span></li>
-      <li><span class="bench-name">Echo</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width:22%"></div></div><span class="bench-val">~140k req/s</span></li>
-      <li><span class="bench-name">Gin</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width:19%"></div></div><span class="bench-val">~120k req/s</span></li>
-      <li><span class="bench-name">net/http</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width:13%"></div></div><span class="bench-val">~85k req/s</span></li>
+      <li><span class="bench-name">Breeze</span><div class="bench-bar-wrap"><div class="bench-bar" style="width: 0px;" data-target="100%"></div></div><span class="bench-val">~630k req/s</span></li>
+      <li><span class="bench-name">Fiber</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="33%"></div></div><span class="bench-val">~210k req/s</span></li>
+      <li><span class="bench-name">Echo</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="22%"></div></div><span class="bench-val">~140k req/s</span></li>
+      <li><span class="bench-name">Gin</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="19%"></div></div><span class="bench-val">~120k req/s</span></li>
+      <li><span class="bench-name">net/http</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="13%"></div></div><span class="bench-val">~85k req/s</span></li>
     </ul>
     <p style="font-size:.8rem;margin-top:.75rem">* Approximate. Run benchmarks in your environment for authoritative numbers.</p>
   </section>
 
   <!-- ── Getting Started ─────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-install">
+  <section class="doc-section reveal" id="doc-install">
     <h2 class="section-title">Installation</h2>
     <p>Requires Go 1.24.3 or later.</p>
     <div class="code-block">
@@ -657,7 +678,7 @@
     <p>The module pulls in <strong>gnet v2</strong> for the event loop, <strong>go-json</strong> for fast JSON marshaling, <strong>brotli</strong> for compression, and <strong>golang-jwt/jwt</strong> for authentication.</p>
   </section>
 
-  <section class="doc-section" id="doc-quickstart">
+  <section class="doc-section reveal" id="doc-quickstart">
     <h2 class="section-title">Quick Start</h2>
     <p>A complete working server in under 20 lines.</p>
     <div class="code-block">
@@ -691,7 +712,7 @@ func main() {
     </div>
   </section>
 
-  <section class="doc-section" id="doc-server">
+  <section class="doc-section reveal" id="doc-server">
     <h2 class="section-title">Server Config</h2>
     <p><code>app.Run(port, multiCore)</code> starts the gnet event loop with sensible defaults baked in.</p>
     <div class="table-wrap"><table>
@@ -710,7 +731,7 @@ app.Run(8080, false)  // single-core — useful for dev / debugging</pre>
   </section>
 
   <!-- ── Router ─────────────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-router">
+  <section class="doc-section reveal" id="doc-router">
     <h2 class="section-title">Router</h2>
     <p>Create a router, register global middleware, then define routes. Routes support static segments, named parameters, and wildcards.</p>
     <h3 class="sub-title">Methods</h3>
@@ -752,7 +773,7 @@ router.Handle(breeze.POST, "/admin/action", adminHandler,
   </section>
 
   <!-- ── Context ───────────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-context">
+  <section class="doc-section reveal" id="doc-context">
     <h2 class="section-title">Context</h2>
     <p>Every handler receives a <code>*breeze.Context</code>. It carries the connection, parsed request, response, route params, and controls the middleware chain.</p>
     <h3 class="sub-title">Response Helpers</h3>
@@ -797,7 +818,7 @@ func AuthMiddleware(ctx *breeze.Context) {
   </section>
 
   <!-- ── Request ───────────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-request">
+  <section class="doc-section reveal" id="doc-request">
     <h2 class="section-title">Request</h2>
     <p><code>ctx.Req</code> is a <code>*breeze.HTTPRequest</code> parsed from raw bytes with zero unnecessary allocations.</p>
     <div class="code-block">
@@ -815,7 +836,7 @@ limit := ctx.Query("limit")  // "20"</pre>
   </section>
 
   <!-- ── Response ─────────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-response">
+  <section class="doc-section reveal" id="doc-response">
     <h2 class="section-title">Response</h2>
     <p><code>ctx.Res</code> is a <code>*breeze.HTTPResponse</code>. Breeze serializes it to raw HTTP/1.1 bytes using <code>strconv.AppendInt</code> — no <code>fmt.Sprintf</code>, pre-sized buffer, array-indexed status text.</p>
     <div class="table-wrap"><table>
@@ -830,7 +851,7 @@ limit := ctx.Query("limit")  // "20"</pre>
   </section>
 
   <!-- ── Params ───────────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-params">
+  <section class="doc-section reveal" id="doc-params">
     <h2 class="section-title">Params &amp; Query</h2>
     <div class="code-block">
       <div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
@@ -854,7 +875,7 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
        TEMPLATE ENGINE — complete section
        ══════════════════════════════════════════════════════════════════════ -->
 
-  <section class="doc-section" id="doc-template">
+  <section class="doc-section reveal" id="doc-template">
     <h2 class="section-title">Template Engine <span class="badge">new</span></h2>
     <p class="section-desc">Breeze ships a full server-side HTML template engine powered by Go's <code>html/template</code> package. It supports layouts, reusable components, automatic SPA partial rendering, a reactive client-side data store, and hot-reload dev mode — with zero external dependencies.</p>
 
@@ -867,7 +888,7 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     </div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-setup">
+  <section class="doc-section reveal" id="doc-tmpl-setup">
     <h2 class="section-title">Setup &amp; Config</h2>
     <p>Create a <code>TemplateEngine</code> with <code>NewTemplateEngine</code>, then wire it into the router. All fields have sensible defaults.</p>
     <div class="code-block">
@@ -896,7 +917,7 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     </table></div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-dir">
+  <section class="doc-section reveal" id="doc-tmpl-dir">
     <h2 class="section-title">Directory Structure</h2>
     <p>Breeze expects two separate directories — one for full-page views and one for reusable components. The layout file lives inside the views directory.</p>
     <div class="dir-tree">
@@ -917,7 +938,7 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     <p>Every component file uses <code>{{"{{"}}define "name"{{"}}"}}…{{"{{"}}end{{"}}"}}</code>. View files use <code>{{"{{"}}define "content"{{"}}"}}…{{"{{"}}end{{"}}"}}</code>. The layout file uses <code>{{"{{"}}define "layout"{{"}}"}}…{{"{{"}}end{{"}}"}}</code>.</p>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-views">
+  <section class="doc-section reveal" id="doc-tmpl-views">
     <h2 class="section-title">Views &amp; Layout</h2>
     <p>A <strong>view</strong> is a <code>.html</code> file inside <code>ViewsDir</code> that defines a <code>"content"</code> block. The <strong>layout</strong> wraps every view by embedding that block via <code>{{"{{"}}template "content" .{{"}}"}}</code>.</p>
 
@@ -980,7 +1001,7 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     <p>Set <code>LayoutFile: ""</code> in <code>TemplateConfig</code> to render views without a shared layout. The view template itself is executed directly.</p>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-components">
+  <section class="doc-section reveal" id="doc-tmpl-components">
     <h2 class="section-title">Components</h2>
     <p>Components are reusable HTML fragments that live in <code>ComponentsDir</code>. Each file defines a named template block using <code>{{"{{"}}define "name"{{"}}"}}…{{"{{"}}end{{"}}"}}</code>.</p>
 
@@ -1020,7 +1041,7 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     </div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-builtins">
+  <section class="doc-section reveal" id="doc-tmpl-builtins">
     <h2 class="section-title">Built-in Template Functions</h2>
     <p>Breeze registers these functions automatically in addition to Go's standard template functions:</p>
     <div class="table-wrap"><table>
@@ -1062,7 +1083,7 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     </div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-routes">
+  <section class="doc-section reveal" id="doc-tmpl-routes">
     <h2 class="section-title">Route Helpers</h2>
     <p>Three methods on <code>*Router</code> integrate the template engine with routing:</p>
 
@@ -1112,7 +1133,7 @@ router.Fragment("/fragments/stats", engine, "stats", func(ctx *breeze.Context) a
     </div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-data">
+  <section class="doc-section reveal" id="doc-tmpl-data">
     <h2 class="section-title">Page Data</h2>
     <p>When a full page is rendered, Breeze serializes your data as JSON and embeds it in the page inside a non-executing script tag. This makes the data available to client-side JavaScript without a separate API call.</p>
     <div class="code-block">
@@ -1128,7 +1149,7 @@ const name = breeze.data("name"); // "Alice"</pre>
     <p>The data object is also available from any <code>breeze.watch()</code> subscriber and can be replaced with <code>breeze.setData(newData)</code>.</p>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-spa">
+  <section class="doc-section reveal" id="doc-tmpl-spa">
     <h2 class="section-title">SPA Runtime</h2>
     <p>On every full-page render, Breeze injects a self-contained JavaScript runtime just before <code>&lt;/body&gt;</code>. It turns your multi-page app into a single-page app automatically — no configuration required.</p>
 
@@ -1206,7 +1227,7 @@ body.breeze-loading::before {
     </table></div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-scripts">
+  <section class="doc-section reveal" id="doc-tmpl-scripts">
     <h2 class="section-title">Script Lifecycle</h2>
     <p>When the SPA runtime swaps content into <code>#breeze-app</code>, it re-runs scripts found in the new fragment according to these rules:</p>
 
@@ -1235,7 +1256,7 @@ body.breeze-loading::before {
 
 &lt;!-- No attribute — only runs on hard page load (default) --&gt;
 &lt;script&gt;
-  const ws = breeze.ws('/ws', { onMessage: e => console.log(e.data) });
+  const ws = breeze.ws('/ws', { onMessage: e =&gt; console.log(e.data) });
 &lt;/script&gt;</pre>
     </div>
 
@@ -1244,7 +1265,7 @@ body.breeze-loading::before {
     </div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-forms">
+  <section class="doc-section reveal" id="doc-tmpl-forms">
     <h2 class="section-title">SPA Forms</h2>
     <p>The runtime automatically intercepts <code>&lt;form&gt;</code> submits and handles them without a full page reload — progressive enhancement means forms still work without JavaScript.</p>
 
@@ -1293,7 +1314,7 @@ body.breeze-loading::before {
     </div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-client">
+  <section class="doc-section reveal" id="doc-tmpl-client">
     <h2 class="section-title">Client API — <code>breeze.*</code></h2>
     <p>The runtime injects a <code>window.breeze</code> object with utilities for fetching fragments, polling, navigation, reactive data, re-rendering, and WebSocket connections.</p>
 
@@ -1395,7 +1416,7 @@ conn.close();                // gracefully close
     </table></div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-rerender">
+  <section class="doc-section reveal" id="doc-tmpl-rerender">
     <h2 class="section-title">Re-render Endpoint</h2>
     <p>Call <code>router.EnableReRender(engine)</code> once at startup to register <code>POST /breeze/render</code>. The client-side <code>breeze.render()</code> uses this endpoint when the template source is not embedded locally.</p>
     <div class="code-block">
@@ -1430,7 +1451,7 @@ document.querySelector('#stats-box').innerHTML = await res.text();</pre>
     </div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-devmode">
+  <section class="doc-section reveal" id="doc-tmpl-devmode">
     <h2 class="section-title">Dev Mode</h2>
     <p>Set <code>DevMode: true</code> in <code>TemplateConfig</code> to disable template caching. Every request re-parses the template files from disk, so changes to <code>.html</code> files are reflected immediately without restarting the server.</p>
     <div class="code-block">
@@ -1444,7 +1465,7 @@ document.querySelector('#stats-box').innerHTML = await res.text();</pre>
     </div>
   </section>
 
-  <section class="doc-section" id="doc-tmpl-preload">
+  <section class="doc-section reveal" id="doc-tmpl-preload">
     <h2 class="section-title">Preload</h2>
     <p>Call <code>engine.Preload()</code> at startup (after all routes are registered) to parse all views and components eagerly. This surfaces template errors on startup rather than on the first request, and warms the cache so the first users don't pay the parse cost.</p>
     <div class="code-block">
@@ -1462,7 +1483,7 @@ router.View("/", engine, "home", nil)</pre>
   </section>
 
   <!-- ── Middlewares ─────────────────────────────────────────────────────── -->
-  <section class="doc-section" id="middlewares-section">
+  <section class="doc-section reveal" id="middlewares-section">
     <h2 class="section-title">Middleware</h2>
     <p class="section-desc">Every middleware is a <code>HandlerFunc</code> — composable, testable, and zero-dependency on each other.</p>
     <div class="mw-tabs">
@@ -1592,21 +1613,21 @@ hub := app.WebSocket("/ws", &amp;breeze.WSHandlerFunc{
   </section>
 
   <!-- ── Middleware docs ────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-mw-logger">
+  <section class="doc-section reveal" id="doc-mw-logger">
     <h2 class="section-title">Logger middleware</h2>
     <p>Logs method, path, status, and elapsed time for every request. Output goes to stdout in RFC3339 format.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>router.Use(middleware.LoggingMiddleware())
 // Output: [Breeze][2026-06-23T12:00:00Z] GET /users -&gt; 200 (1.2ms)</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-mw-recovery">
+  <section class="doc-section reveal" id="doc-mw-recovery">
     <h2 class="section-title">Panic Recovery middleware</h2>
     <p>Wraps the entire handler chain in a <code>defer/recover</code>. On panic: logs the value + full stack trace, sets 500, calls <code>ctx.Abort()</code>. Your server never crashes from a handler bug.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>router.Use(middleware.RecoveryMiddleware())
 // Register first so it wraps everything else</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-mw-cors">
+  <section class="doc-section reveal" id="doc-mw-cors">
     <h2 class="section-title">CORS middleware</h2>
     <p>Sets <code>Access-Control-*</code> headers and handles <code>OPTIONS</code> preflight automatically.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>router.Use(middleware.CORSMiddleware(middleware.CORSOptions{
@@ -1619,7 +1640,7 @@ hub := app.WebSocket("/ws", &amp;breeze.WSHandlerFunc{
 }))</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-mw-helmet">
+  <section class="doc-section reveal" id="doc-mw-helmet">
     <h2 class="section-title">Helmet middleware</h2>
     <p>Sets security-hardening HTTP headers. Use the opinionated defaults or configure individually.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>router.Use(middleware.DefaultSecurityMiddleware())
@@ -1643,7 +1664,7 @@ router.Use(middleware.SecurityMiddleware(middleware.SecurityOptions{
     </table></div>
   </section>
 
-  <section class="doc-section" id="doc-mw-jwt">
+  <section class="doc-section reveal" id="doc-mw-jwt">
     <h2 class="section-title">JWT Auth middleware</h2>
     <p>Full JWT authentication with optional refresh token rotation, RBAC, and custom claims validation.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>token, _   := middleware.GenerateJWT("secret", jwt.MapClaims{
@@ -1671,7 +1692,7 @@ router.Use(middleware.JWTAuthMiddleware(middleware.JWTOptions{
 },</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-mw-rate">
+  <section class="doc-section reveal" id="doc-mw-rate">
     <h2 class="section-title">Rate Limiter middleware</h2>
     <p>In-memory token counter per remote IP. Resets after each <code>Per</code> window. Returns <code>429 Too Many Requests</code>.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>router.Use(middleware.NewRateLimiter(middleware.RateLimiterOptions{
@@ -1688,21 +1709,21 @@ router.Handle(breeze.POST, "/login", loginHandler,
 )</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-mw-etag">
+  <section class="doc-section reveal" id="doc-mw-etag">
     <h2 class="section-title">ETag Cache middleware</h2>
     <p>Computes an MD5 ETag from the response body. On matching <code>If-None-Match</code>, returns <code>304 Not Modified</code>.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>cache := middleware.NewETagCache()
 router.Use(cache.ETagMiddleware())</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-mw-compress">
+  <section class="doc-section reveal" id="doc-mw-compress">
     <h2 class="section-title">Compression middleware</h2>
     <p>Negotiates the best encoding from the client's <code>Accept-Encoding</code> header. Priority: Brotli → Gzip → Deflate → none.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>router.Use(middleware.CompressionMiddleware())
 // Sets Content-Encoding: br / gzip / deflate automatically</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-mw-swagger">
+  <section class="doc-section reveal" id="doc-mw-swagger">
     <h2 class="section-title">Swagger / OpenAPI 3.1 <span class="badge">new</span></h2>
     <p>Annotate routes at registration time using Go structs. No YAML, no code generation, no build step.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>type CreateUserRequest struct {
@@ -1738,7 +1759,7 @@ router.Handle(breeze.POST, "/users", createUser,
   </section>
 
   <!-- ── WebSocket ─────────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-websocket">
+  <section class="doc-section reveal" id="doc-websocket">
     <h2 class="section-title">WebSocket built-in</h2>
     <p>Breeze implements RFC 6455 WebSocket directly inside the gnet event loop — no goroutine-per-connection, no third-party WS library. After the HTTP upgrade handshake, the connection is promoted to WebSocket mode and all subsequent traffic bypasses the HTTP parser entirely.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>type ChatHandler struct { hub *breeze.WSHub }
@@ -1766,7 +1787,7 @@ func main() {
 }</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-ws-handler">
+  <section class="doc-section reveal" id="doc-ws-handler">
     <h2 class="section-title">Handler Interface</h2>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>type WSHandler interface {
     OnConnect(conn *WSConn)
@@ -1790,7 +1811,7 @@ app.WebSocket("/ws/echo", &amp;breeze.WSHandlerFunc{
     </table></div>
   </section>
 
-  <section class="doc-section" id="doc-ws-wsconn">
+  <section class="doc-section reveal" id="doc-ws-wsconn">
     <h2 class="section-title">WSConn</h2>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>conn.SendText("hello")
 conn.SendBinary([]byte{0x01, 0x02})
@@ -1809,7 +1830,7 @@ addr := conn.RemoteAddr()</pre></div>
     </table></div>
   </section>
 
-  <section class="doc-section" id="doc-ws-hub">
+  <section class="doc-section reveal" id="doc-ws-hub">
     <h2 class="section-title">WSHub</h2>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>hub := app.Hub()
 
@@ -1825,7 +1846,7 @@ hub2 := app.WebSocket("/ws/events", eventsHandler)
 // hub1 == hub2 == app.Hub()</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-ws-close">
+  <section class="doc-section reveal" id="doc-ws-close">
     <h2 class="section-title">Close Codes</h2>
     <div class="table-wrap"><table>
       <thead><tr><th>Code</th><th>Name</th><th>When</th></tr></thead>
@@ -1842,8 +1863,425 @@ hub2 := app.WebSocket("/ws/events", eventsHandler)
     </table></div>
   </section>
 
+  <!-- ── Dashboard ──────────────────────────────────────────────────────── -->
+  <section class="doc-section reveal" id="doc-dash-overview">
+    <h2 class="section-title">Developer Dashboard <span class="badge">new</span></h2>
+    <p class="section-desc">A built-in, production-grade observability surface for every Breeze app — one mount call, zero external dependencies.</p>
+    <p>The dashboard is shipped as a native Breeze module under <code>github.com/nelthaarion/breeze/dashboard</code>. It mounts a single-page application at <code>/dashboard</code> that gives you live insight into traffic, routes, database queries, caches, queues, scheduler jobs, logs, runtime metrics, and per-request traces — without leaving your process, and without wiring up a second observability stack.</p>
+    <p>It is engineered to be <strong>zero-overhead when disabled</strong>. If you never call <code>dash.Mount()</code>, the dashboard contributes no goroutines, no routes, no allocations, and no GC pressure to your hot path. Once enabled, instrumentation uses lock-free atomics and per-event-loop ring buffers so the act of measuring never becomes the bottleneck.</p>
+    <div class="callout info">
+      <p><strong>Single-file SPA.</strong> The entire UI is served from one in-memory HTML response with inlined CSS and JS — no CDN, no build step, no external fonts. It works on air-gapped networks and behind corporate proxies that strip external assets.</p>
+    </div>
+    <h3 class="sub-title">What's inside</h3>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="fi">📈</span>
+        <h4>Real-time Overview</h4>
+        <p>RPS, latency p50/p95/p99, memory, goroutines, CPU — updated every second.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">🛣</span>
+        <h4>Routes Explorer</h4>
+        <p>Per-route latency, call counts and error rates with method filtering.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">🧪</span>
+        <h4>API Explorer</h4>
+        <p>Send test requests and copy ready-to-run snippets in 6 languages.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">📡</span>
+        <h4>Live Requests</h4>
+        <p>WebSocket-pushed feed of every incoming request and its outcome.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">🗄</span>
+        <h4>Database Browser</h4>
+        <p>Read-only, paginated inspection of any registered table.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">🔍</span>
+        <h4>Query Monitor</h4>
+        <p>Slow-query detection, N+1 warnings and per-query timings.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">💾</span>
+        <h4>Cache · Queue · Scheduler</h4>
+        <p>Hit/miss ratios, queue depth, and upcoming job runs at a glance.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">📝</span>
+        <h4>Logs</h4>
+        <p>Five-tab log viewer: App, HTTP, Errors, Panics, Warnings.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">❤️</span>
+        <h4>Health Checks</h4>
+        <p>Green / yellow / red indicators for every registered probe.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">⚡</span>
+        <h4>Runtime Metrics</h4>
+        <p>GC pauses, heap snapshots and CPU profile, charted live.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">🕒</span>
+        <h4>Developer Timeline</h4>
+        <p>Per-request profiler with expandable steps for every subsystem.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">🔒</span>
+        <h4>Auth &amp; Masking</h4>
+        <p>HTTP Basic Auth plus automatic redaction of cookies and API keys.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-setup">
+    <h2 class="section-title">Setup &amp; Authentication</h2>
+    <p>Mounting the dashboard is a single call. The constructor takes the host <code>*breeze.Router</code> and a <code>Config</code> struct; <code>Mount()</code> registers the <code>/dashboard</code> route tree. Everything else is automatic — instrumentation hooks are wired into the router, the worker pool, and the WebSocket engine as soon as the dashboard is mounted.</p>
+    <div class="code-block">
+      <div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>package main
+
+import (
+    "os"
+    "runtime"
+
+    "github.com/nelthaarion/breeze"
+    "github.com/nelthaarion/breeze/dashboard"
+    middleware "github.com/nelthaarion/breeze/middlewares"
+)
+
+func main() {
+    router := breeze.NewRouter()
+    router.Use(middleware.RecoveryMiddleware())
+    router.Use(middleware.LoggingMiddleware())
+
+    // ── Application routes ────────────────────────────────────────────
+    router.Handle(breeze.GET, "/health", func(ctx *breeze.Context) {
+        ctx.JSON(map[string]string{"status": "ok"})
+    })
+
+    // ── Mount the developer dashboard ────────────────────────────────
+    dash := dashboard.New(router, dashboard.Config{
+        Username: "admin",
+        Password: os.Getenv("DASH_PASSWORD"),   // never hard-code
+        Path:     "/dashboard",                  // default; shown for clarity
+        Enabled:  true,                          // omit or false to disable
+        MaskSecrets: []string{"Authorization", "Cookie", "X-API-Key"},
+    })
+    dash.Mount()   // registers GET /dashboard and /dashboard/*
+
+    pool := breeze.NewWorkerPool(runtime.NumCPU())
+    app  := breeze.New(router, pool)
+    app.Run(3000, true)
+}</pre>
+    </div>
+    <h3 class="sub-title">Config fields</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>Username</code></td><td><code>string</code></td><td><code>"admin"</code></td><td>HTTP Basic Auth username. Must be non-empty or <code>Mount()</code> panics.</td></tr>
+        <tr><td><code>Password</code></td><td><code>string</code></td><td>—</td><td>HTTP Basic Auth password. Read from an env var or secret manager in production.</td></tr>
+        <tr><td><code>Path</code></td><td><code>string</code></td><td><code>"/dashboard"</code></td><td>Root path the SPA is served at. Must start with <code>/</code>.</td></tr>
+        <tr><td><code>Enabled</code></td><td><code>bool</code></td><td><code>false</code></td><td>When <code>false</code>, <code>Mount()</code> is a no-op — perfect for disabling in tests via a single env flag.</td></tr>
+        <tr><td><code>MaskSecrets</code></td><td><code>[]string</code></td><td>see note</td><td>Header names whose values are redacted in the Live Requests feed and log viewer. Default covers <code>Authorization</code>, <code>Cookie</code>, and <code>X-API-Key</code>.</td></tr>
+        <tr><td><code>DB</code></td><td><code>*sql.DB</code></td><td><code>nil</code></td><td>Optional. When set, the Database Browser and ORM Query Monitor become available.</td></tr>
+        <tr><td><code>HealthChecks</code></td><td><code>[]HealthCheck</code></td><td><code>nil</code></td><td>Application-defined probes (DB ping, cache ping, downstream API) surfaced in the Health tab.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout">
+      <p><strong>Zero-overhead when disabled.</strong> If <code>Enabled</code> is <code>false</code>, <code>New()</code> still returns a non-nil <code>*Dashboard</code>, but <code>Mount()</code> short-circuits before registering any routes or starting any goroutines. This means you can ship the same binary to production and to your test harness without paying any instrumentation cost in CI.</p>
+    </div>
+    <h3 class="sub-title">Authentication model</h3>
+    <p>The dashboard is protected by HTTP Basic Auth over the same TLS (or plain HTTP) connection as your app. Credentials are compared in constant time using <code>crypto/subtle</code> to mitigate timing attacks. On a failed challenge the dashboard responds with <code>401 WWW-Authenticate: Basic realm="breeze-dashboard"</code> — browsers will then prompt the user natively.</p>
+    <p>For multi-tenant deployments or stricter access control, mount the dashboard behind an additional middleware: <code>router.Use(middleware.JWTAuthMiddleware(secret))</code> before calling <code>dash.Mount()</code>. JWT and Basic Auth compose cleanly because they live in different layers of the request pipeline.</p>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-realtime">
+    <h2 class="section-title">Real-time Overview</h2>
+    <p>The landing panel of the dashboard. It gives you a one-glance answer to "is my service healthy right now?" by combining five high-signal metrics, each updated on a one-second cadence via a single multiplexed WebSocket.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Metric</th><th>Source</th><th>What it tells you</th></tr></thead>
+      <tbody>
+        <tr><td><strong>RPS</strong></td><td>per-event-loop request counter</td><td>Sustained throughput. Sudden drops usually mean an upstream dependency or DNS issue.</td></tr>
+        <tr><td><strong>Latency p50 / p95 / p99</strong></td><td>per-route histogram, ring-buffered</td><td>Where most users live (p50) vs. the long tail (p99). A widening p99/p50 ratio is the earliest sign of contention.</td></tr>
+        <tr><td><strong>Memory</strong></td><td><code>runtime.ReadMemStats</code></td><td>Heap alloc, in-use heap and total alloc rate. Sawtooth patterns indicate healthy GC; flat-up ramps indicate a leak.</td></tr>
+        <tr><td><strong>Goroutines</strong></td><td><code>runtime.NumGoroutine</code></td><td>Active goroutine count. A monotonic climb without a corresponding traffic increase is the classic leak signature.</td></tr>
+        <tr><td><strong>CPU</strong></td><td>per-event-loop utilisation</td><td>How saturated each reactor is. With <code>multiCore=true</code>, you'll see one trace per event loop.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Charts are rendered client-side using a tiny inlined SVG library — no charting framework is shipped, which keeps the single-file payload under 80&nbsp;KB gzipped. Each series can be toggled, pinned to a custom range, or exported as CSV via the toolbar.</p>
+    <div class="callout info">
+      <p><strong>Backfill on connect.</strong> When the WebSocket opens, the server immediately pushes the last 60 seconds of every series so charts are populated on first paint — no empty-graph flash.</p>
+    </div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-routes">
+    <h2 class="section-title">Routes Explorer</h2>
+    <p>A live table of every route registered on the host <code>*breeze.Router</code>, joined with per-route runtime statistics. The route table itself comes from <code>Router.RoutesInfo()</code> — the same read-only view the framework exposes to external packages — so what you see in the dashboard is always byte-for-byte identical with what the router will actually match.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Column</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td><code>Method · Pattern</code></td><td>HTTP method and route pattern, with <code>:param</code> and <code>*wildcard</code> segments highlighted</td></tr>
+        <tr><td><code>Calls</code></td><td>Total invocations since process start</td></tr>
+        <tr><td><code>p50 / p95 / p99</code></td><td>Latency quantiles, computed from a 5-minute sliding window</td></tr>
+        <tr><td><code>Errors</code></td><td>Responses with status <code>&ge; 500</code>, with a percentage of total calls</td></tr>
+        <tr><td><code>Last</code></td><td>Time since the most recent invocation</td></tr>
+      </tbody>
+    </table></div>
+    <p>Click any row to drill into a per-route detail view: the middleware chain (in execution order), the handler source location if available, the recent request samples, and a latency distribution histogram. Filtering by method or by a free-text pattern match is supported from the toolbar.</p>
+    <h4 class="mini-title">Tip</h4>
+    <p>Sort by <code>p99</code> descending to instantly find the slowest endpoints in your service — this is usually more actionable than overall p99 because it isolates the few routes that drag the aggregate up.</p>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-api">
+    <h2 class="section-title">API Explorer</h2>
+    <p>A built-in alternative to Postman or Swagger UI. Pick any route from the Routes Explorer, fill in path params, query string, headers and a JSON body, and click <strong>Send</strong>. The dashboard issues the request through the same gnet event loop your real traffic uses, so what you measure is what your users get.</p>
+    <p>Every sent request can be exported as a ready-to-run code snippet in six languages. Use the language tabs above the response panel.</p>
+    <div class="mw-tabs">
+      <button class="mw-tab active" onclick="showMW(this,'dash-api-curl')">curl</button>
+      <button class="mw-tab" onclick="showMW(this,'dash-api-go')">Go</button>
+      <button class="mw-tab" onclick="showMW(this,'dash-api-js')">JavaScript</button>
+      <button class="mw-tab" onclick="showMW(this,'dash-api-py')">Python</button>
+      <button class="mw-tab" onclick="showMW(this,'dash-api-cs')">C#</button>
+      <button class="mw-tab" onclick="showMW(this,'dash-api-php')">PHP</button>
+    </div>
+    <div class="mw-panel active" id="dash-api-curl">
+      <div class="code-block"><div class="code-header"><span>shell</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>curl -X POST https://api.example.com/users \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Ada","email":"ada@lovelace.dev"}'</pre></div>
+    </div>
+    <div class="mw-panel" id="dash-api-go">
+      <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>req, _ := http.NewRequest("POST", "https://api.example.com/users",
+    strings.NewReader(`{"name":"Ada","email":"ada@lovelace.dev"}`))
+req.Header.Set("Authorization", "Bearer "+token)
+req.Header.Set("Content-Type", "application/json")
+resp, err := http.DefaultClient.Do(req)</pre></div>
+    </div>
+    <div class="mw-panel" id="dash-api-js">
+      <div class="code-block"><div class="code-header"><span>javascript</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>await fetch("https://api.example.com/users", {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ name: "Ada", email: "ada@lovelace.dev" }),
+});</pre></div>
+    </div>
+    <div class="mw-panel" id="dash-api-py">
+      <div class="code-block"><div class="code-header"><span>python</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>import requests
+requests.post(
+    "https://api.example.com/users",
+    headers={"Authorization": f"Bearer {token}"},
+    json={"name": "Ada", "email": "ada@lovelace.dev"},
+)</pre></div>
+    </div>
+    <div class="mw-panel" id="dash-api-cs">
+      <div class="code-block"><div class="code-header"><span>csharp</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>using var http = new HttpClient();
+http.DefaultRequestHeaders.Authorization = new("Bearer", token);
+var resp = await http.PostAsJsonAsync(
+    "https://api.example.com/users",
+    new { name = "Ada", email = "ada@lovelace.dev" });</pre></div>
+    </div>
+    <div class="mw-panel" id="dash-api-php">
+      <div class="code-block"><div class="code-header"><span>php</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>$ch = curl_init("https://api.example.com/users");
+curl_setopt_array($ch, [
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        "Authorization: Bearer $token",
+        "Content-Type: application/json",
+    ],
+    CURLOPT_POSTFIELDS => json_encode([
+        "name" => "Ada", "email" => "ada@lovelace.dev",
+    ]),
+]);
+curl_exec($ch);</pre></div>
+    </div>
+    <p>Responses are pretty-printed, syntax-highlighted, and timed. The status, latency and response size are surfaced in the toolbar so you can compare against the route's historical p95 in one glance.</p>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-requests">
+    <h2 class="section-title">Live Requests Feed</h2>
+    <p>A real-time, tail-style feed of every request handled by the framework. Push happens over a dedicated WebSocket channel — the dashboard multiplexes all of its live views (Overview, Live Requests, Logs, Timeline) over a single socket to keep connection overhead predictable.</p>
+    <p>Each entry shows the method, path, status, latency, and the originating client IP. Click an entry to expand the full request/response envelope: headers (with secrets masked — see <a href="#doc-dash-setup">Setup &amp; Authentication</a>), request body, response body, and a deep-link into the Developer Timeline for that request.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Control</th><th>Behaviour</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Pause</strong></td><td>Stops rendering new entries without closing the socket; existing entries remain visible</td></tr>
+        <tr><td><strong>Filter</strong></td><td>Free-text match on method, path or status code; supports <code>status:&gt;=400</code> and <code>method:GET</code> prefixes</td></tr>
+        <tr><td><strong>Clear</strong></td><td>Drops the in-browser buffer only — server-side ring buffer is unaffected</td></tr>
+        <tr><td><strong>Replay</strong></td><td>Re-issues the selected request through the API Explorer, pre-filled with the original headers and body</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout info">
+      <p><strong>Memory-bounded.</strong> The server keeps the last 1,024 request envelopes per event loop in a ring buffer; older entries are evicted automatically. The browser keeps the last 200 visible entries by default — bump it from the toolbar if you need more history in a tab.</p>
+    </div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-db">
+    <h2 class="section-title">Database Browser</h2>
+    <p>A read-only, paginated table inspector for the database registered via <code>Config.DB</code>. Use it to verify schema state, look up a row by primary key, or sanity-check reference data during development — without reaching for a separate SQL client.</p>
+    <h3 class="sub-title">Capabilities</h3>
+    <ul class="doc-list">
+      <li>List all tables and views exposed by the <code>*sql.DB</code> driver</li>
+      <li>Inspect column names, types, nullability and primary-key flags</li>
+      <li>Paginated row view (50 rows/page, configurable) with column sorting</li>
+      <li>Free-text <code>WHERE</code> clause builder for ad-hoc filtering</li>
+      <li>CSV export of the current result set, capped at 10,000 rows</li>
+    </ul>
+    <div class="callout">
+      <p><strong>Read-only by construction.</strong> The browser only ever issues <code>SELECT</code> statements, and it wraps every query in a read-only transaction (<code>sql.TxOptions{ReadOnly: true}</code>). Drivers that respect this flag (Postgres, MySQL with <code>--read-only</code>) will reject any write attempt at the engine level — there is no UI path that can mutate data.</p>
+    </div>
+    <h4 class="mini-title">Production safety</h4>
+    <p>The browser is disabled by default in production builds. Enable it explicitly via <code>Config.EnableDBBrowser</code>, and consider pointing it at a read-replica instead of your primary. The dashboard will refuse to mount the Database Browser if <code>Config.DB</code> is <code>nil</code>, so a misconfiguration fails closed rather than silently serving an empty page.</p>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-orm">
+    <h2 class="section-title">ORM Query Monitor</h2>
+    <p>When a Breeze ORM adapter is registered with the dashboard, every SQL statement it issues is captured with its wall-clock duration, the calling goroutine, and — when source information is available — the file and line that triggered it. The result is a per-query timeline that makes slow queries and N+1 patterns obvious without a separate APM agent.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Signal</th><th>Detection rule</th><th>Severity</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Slow query</strong></td><td>Wall time exceeds the configured threshold (default 200 ms)</td><td>Warning</td></tr>
+        <tr><td><strong>N+1 pattern</strong></td><td>The same parameterised query runs more than 5 times within a single request</td><td>Warning</td></tr>
+        <tr><td><strong>Missing index</strong></td><td><code>EXPLAIN</code> indicates a sequential scan on a table larger than 10k rows</td><td>Info</td></tr>
+        <tr><td><strong>Idle in transaction</strong></td><td>A transaction stays open longer than 1 s without a follow-up query</td><td>Error</td></tr>
+        <tr><td><strong>High statement churn</strong></td><td>Distinct prepared-statement count climbs without bound</td><td>Info</td></tr>
+      </tbody>
+    </table></div>
+    <p>Each finding links back to the Developer Timeline entry that produced it, so you can see the exact request, the exact handler, and the exact line of code that triggered the offending query — closing the loop from symptom to root cause in a single click.</p>
+    <div class="code-block">
+      <div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>// Registering the ORM adapter wires query capture into the dashboard.
+// Replace with your actual adapter (sqlx, gorm, ent, …).
+dash.RegisterORM(breezeorm.NewAdapter(db, breezeorm.Config{
+    SlowThreshold:     200 * time.Millisecond,
+    NPlusOneThreshold: 5,
+    CaptureExplain:    true,
+}))</pre>
+    </div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-cache">
+    <h2 class="section-title">Cache, Queue &amp; Scheduler Monitors</h2>
+    <p>Three side-by-side panels summarise the stateful subsystems that often fail silently: caches, queues, and schedulers. Each monitor pulls from a small adapter interface — implement it once per backend (Redis, in-memory, Asynq, River, cron, …) and the dashboard handles the rest.</p>
+    <h3 class="sub-title">Cache panel</h3>
+    <ul class="doc-list">
+      <li>Hit / miss / error ratio per cache, with a 60-second rolling sparkline</li>
+      <li>Current key count, total bytes, and eviction rate</li>
+      <li>Top-10 keys by access frequency — useful for spotting hot keys</li>
+    </ul>
+    <h3 class="sub-title">Queue panel</h3>
+    <ul class="doc-list">
+      <li>Depth and throughput per queue, with consumer-lag trend</li>
+      <li>Dead-letter count and oldest unacked message age</li>
+      <li>Per-worker goroutine state (idle / busy / crashed)</li>
+    </ul>
+    <h3 class="sub-title">Scheduler panel</h3>
+    <ul class="doc-list">
+      <li>Job name, cron expression, next run, last run, last status</li>
+      <li>Last-run duration vs. the job's interval — flag jobs that overlap themselves</li>
+      <li>Manual "Run now" trigger for one-off execution during debugging</li>
+    </ul>
+    <div class="callout info">
+      <p><strong>Zero-config for in-process backends.</strong> If you use Breeze's built-in in-memory cache and worker-pool-backed scheduler, the adapters are registered automatically when <code>dash.Mount()</code> runs. External backends (Redis, Asynq, etc.) require an explicit <code>dash.RegisterCache(...)</code> / <code>RegisterQueue(...)</code> / <code>RegisterScheduler(...)</code> call.</p>
+    </div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-logs">
+    <h2 class="section-title">Logs</h2>
+    <p>A unified log viewer with five tabs, each backed by an independent ring buffer so opening one tab does not evict entries from another. Logs are streamed live over the same multiplexed WebSocket as the rest of the dashboard, with backpressure handled by dropping the oldest entries rather than blocking the application.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Tab</th><th>Source</th><th>Default buffer</th></tr></thead>
+      <tbody>
+        <tr><td><strong>App</strong></td><td><code>log.Printf</code> / <code>breeze.Log</code> output captured via <code>log.SetOutput</code></td><td>2,048 lines</td></tr>
+        <tr><td><strong>HTTP</strong></td><td>One entry per handled request, written by the <code>LoggingMiddleware</code></td><td>4,096 lines</td></tr>
+        <tr><td><strong>Errors</strong></td><td>Application-returned responses with status <code>&ge; 500</code></td><td>1,024 lines</td></tr>
+        <tr><td><strong>Panics</strong></td><td>Recovered panics from <code>RecoveryMiddleware</code> or the worker pool, with stack traces</td><td>512 lines</td></tr>
+        <tr><td><strong>Warnings</strong></td><td>Slow queries, N+1 detections, idle-in-transaction, etc.</td><td>1,024 lines</td></tr>
+      </tbody>
+    </table></div>
+    <p>Every tab supports case-insensitive free-text filtering, level filtering (where applicable), and a "follow" toggle that auto-scrolls to the newest entry. Long lines are truncated with a click-to-expand affordance so the table stays scannable.</p>
+    <div class="callout">
+      <p><strong>Secrets never leave the process.</strong> The <code>MaskSecrets</code> list from <code>Config</code> is applied before any line is written to a ring buffer. A redacted header value looks like <code>Authorization: &lt;redacted 28 chars&gt;</code> in the UI — enough to confirm presence and length, never enough to leak.</p>
+    </div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-health">
+    <h2 class="section-title">Health Checks &amp; Runtime Metrics</h2>
+    <h3 class="sub-title">Health checks</h3>
+    <p>Each <code>HealthCheck</code> registered via <code>Config.HealthChecks</code> is polled on a configurable interval (default 15 s). The result is rendered as a coloured chip — <strong style="color:#5ce8c0">green</strong> (pass), <strong style="color:#f7c87a">yellow</strong> (slow &gt; 1 s), <strong style="color:#ff6b6b">red</strong> (fail) — alongside the last latency, last error message, and a 60-sample sparkline of recent latencies.</p>
+    <div class="code-block">
+      <div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>dash := dashboard.New(router, dashboard.Config{
+    // …
+    HealthChecks: []dashboard.HealthCheck{
+        {Name: "postgres", Check: func(ctx context.Context) error {
+            return db.PingContext(ctx)
+        }},
+        {Name: "redis", Check: func(ctx context.Context) error {
+            return rdb.Ping(ctx).Err()
+        }},
+        {Name: "downstream:billing", Check: func(ctx context.Context) error {
+            return billingClient.Health(ctx)
+        }},
+    },
+    HealthInterval: 15 * time.Second,
+})</pre>
+    </div>
+    <h3 class="sub-title">Go runtime metrics</h3>
+    <p>A dedicated panel surfaces the runtime statistics that matter most for production Go services. All numbers are sampled in-process via <code>runtime/metrics</code> and <code>runtime/pprof</code> — no agent, no sidecar, no OpenTelemetry SDK required.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Metric</th><th>Visualization</th><th>Why it matters</th></tr></thead>
+      <tbody>
+        <tr><td>GC pause time</td><td>p50 / p95 / max line chart</td><td>Tail latency spikes almost always correlate with GC pauses above 10 ms</td></tr>
+        <tr><td>Heap allocations / sec</td><td>area chart</td><td>The single best leading indicator of GC pressure</td></tr>
+        <tr><td>Live heap bytes</td><td>line chart</td><td>Sawtooth = healthy; monotonic ramp = leak</td></tr>
+        <tr><td>Goroutine count</td><td>line chart</td><td>Unbounded growth without traffic growth = goroutine leak</td></tr>
+        <tr><td>CPU profile</td><td>flame graph (truncated to top 30 frames)</td><td>On-demand 5-second CPU profile, rendered in-browser</td></tr>
+        <tr><td>Memory profile</td><td>flame graph</td><td>On-demand heap profile, useful for leak hunting</td></tr>
+      </tbody>
+    </table></div>
+    <p>CPU and memory profiles are captured on demand — click the <strong>Capture profile</strong> button, wait 5 seconds, and the flame graph renders inline. Profiles never touch disk; they are decoded entirely in the browser.</p>
+  </section>
+
+  <section class="doc-section reveal" id="doc-dash-timeline">
+    <h2 class="section-title">Developer Timeline</h2>
+    <p>The flagship debugging view. Each handled request is captured as a hierarchical timeline of <em>spans</em> — one per middleware, one per DB query, one per cache call, one per downstream HTTP call. The result is a flame-style chart that shows where the request spent its time, with every leaf expandable to the underlying event.</p>
+    <h3 class="sub-title">Span types captured</h3>
+    <div class="pill-row">
+      <span class="pill">middleware</span>
+      <span class="pill">handler</span>
+      <span class="pill green">db.query</span>
+      <span class="pill green">cache.get</span>
+      <span class="pill green">cache.set</span>
+      <span class="pill">http.outbound</span>
+      <span class="pill">queue.publish</span>
+      <span class="pill">scheduler.tick</span>
+      <span class="pill green">template.render</span>
+    </div>
+    <h3 class="sub-title">Anatomy of a timeline entry</h3>
+    <p>Each entry expands to show:</p>
+    <ul class="doc-list">
+      <li><strong>Start offset</strong> — milliseconds since request arrival</li>
+      <li><strong>Duration</strong> — wall time, with a bar proportional to the slowest sibling</li>
+      <li><strong>Args</strong> — query text, cache key, outbound URL, etc. (truncated, click to expand)</li>
+      <li><strong>Result</strong> — rows affected, cache hit/miss, HTTP status, error if any</li>
+      <li><strong>Source</strong> — file:line of the call site, when debug info is enabled</li>
+    </ul>
+    <p>Click any span to filter the timeline to siblings of the same type — instantly answer questions like "show me every DB query this request made, in order" without scrolling past middleware noise.</p>
+    <div class="callout info">
+      <p><strong>Always-on, low-cost.</strong> Spans are recorded into a per-request slice backed by a <code>sync.Pool</code>-managed buffer; in benchmarks the overhead is &lt; 1% on the hot path. You can leave the timeline enabled in production without measurable impact, and sample only the requests you actually want to inspect via <code>Config.TimelineSampling</code>.</p>
+    </div>
+    <h4 class="mini-title">Workflow tip</h4>
+    <p>When a user reports a slow request, grab the request ID from your access logs, paste it into the timeline filter, and you'll see the exact span breakdown for that single request — no need to reproduce, no need to re-deploy with extra logging.</p>
+  </section>
+
   <!-- ── Advanced ───────────────────────────────────────────────────────── -->
-  <section class="doc-section" id="doc-upload">
+  <section class="doc-section reveal" id="doc-upload">
     <h2 class="section-title">File Uploads</h2>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>files, fields, err := ctx.ParseMultipart(10 &lt;&lt; 20) // 10 MB max
 if err != nil { ctx.Status(400); ctx.WriteString(err.Error()); return }
@@ -1866,7 +2304,7 @@ ctx.JSON(map[string]string{"saved": saved})</pre></div>
     </table></div>
   </section>
 
-  <section class="doc-section" id="doc-static">
+  <section class="doc-section reveal" id="doc-static">
     <h2 class="section-title">Static Files</h2>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>// Serve ./public/* at /assets/*
 router.ServeStatic("/assets", "./public")
@@ -1875,7 +2313,7 @@ router.ServeStatic("/assets", "./public")
 // Directory traversal is sanitized with filepath.Clean</pre></div>
   </section>
 
-  <section class="doc-section" id="doc-pool">
+  <section class="doc-section reveal" id="doc-pool">
     <h2 class="section-title">Worker Pool</h2>
     <p>Off-loads handler execution from the gnet event loop so slow handlers don't block all connections on a reactor.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>pool := breeze.NewWorkerPool(runtime.NumCPU())
@@ -1991,6 +2429,8 @@ app := breeze.New(router, nil)</pre></div>
       : 'none';
   }, { passive: true });
 </script>
+
+
 
 </body>
 </html>
