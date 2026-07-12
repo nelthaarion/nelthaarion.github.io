@@ -575,7 +575,7 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
       <li><a href="#doc-mw-rate">Rate Limiter</a></li>
       <li><a href="#doc-mw-etag">ETag Cache</a></li>
       <li><a href="#doc-mw-compress">Compression</a></li>
-      <li><a href="#doc-mw-swagger">Swagger</a></li>
+      <li><a href="#doc-mw-Scalar">Scalar</a></li>
     </ul>
   </div>
 
@@ -625,7 +625,7 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
   <section class="hero" id="hero">
     <span class="hero-eyebrow">Go HTTP Framework</span>
     <h1>Built for <em>raw speed.</em> Shipped clean.</h1>
-    <p>Breeze is an event-driven HTTP framework for Go built on gnet. Zero-allocation hot paths, a composable middleware chain, native WebSocket support with a built-in hub, and Swagger docs — out of the box.</p>
+    <p>Breeze is an event-driven HTTP framework for Go built on gnet. Zero-allocation hot paths, a composable middleware chain, native WebSocket support with a built-in hub, and Scalar docs — out of the box.</p>
     <div class="hero-btns">
       <a href="#doc-install" class="btn-primary">Get Started</a>
       <a href="https://github.com/nelthaarion/breeze" class="btn-outline" target="_blank">View on GitHub</a>
@@ -647,7 +647,7 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
       <div class="feature-card"><div class="fi">🧠</div><h4>Zero-Copy Parsing</h4><p><code>unsafe.String</code> converts raw bytes to strings without copying. Header keys are lowercased in-place.</p></div>
       <div class="feature-card"><div class="fi">🔧</div><h4>Worker Pool</h4><p>Fixed goroutine pool with 16× buffered channel absorbs bursts. Queue-full fallback spawns a goroutine rather than blocking the event loop.</p></div>
       <div class="feature-card"><div class="fi">🔌</div><h4>Native WebSocket</h4><p>RFC 6455 WebSocket built directly into the gnet event loop. Zero goroutine-per-connection.</p></div>
-      <div class="feature-card"><div class="fi">📄</div><h4>OpenAPI 3.1 Built-In</h4><p>Annotate routes with Go structs. Breeze reflects types at startup to generate a live Swagger spec.</p></div>
+      <div class="feature-card"><div class="fi">📄</div><h4>OpenAPI 3.1 Built-In</h4><p>Annotate routes with Go structs. Breeze reflects types at startup to generate a live Scalar spec.</p></div>
       <div class="feature-card"><div class="fi">🎨</div><h4>Template Engine</h4><p>Server-rendered views and components with a built-in SPA runtime, partial rendering, and a client-side reactive store.</p></div>
       <div class="feature-card"><div class="fi">🛡️</div><h4>9 Middleware Suite</h4><p>JWT auth, rate limiting, Brotli/Gzip/Deflate compression, ETag cache, CORS, security headers, logger, panic recovery.</p></div>
     </div>
@@ -1492,7 +1492,7 @@ router.View("/", engine, "home", nil)</pre>
       <button class="mw-tab" onclick="showMW(this,'mw-rate')">Rate Limit</button>
       <button class="mw-tab" onclick="showMW(this,'mw-compress')">Compression</button>
       <button class="mw-tab" onclick="showMW(this,'mw-helmet')">Helmet</button>
-      <button class="mw-tab" onclick="showMW(this,'mw-swagger')">Swagger</button>
+      <button class="mw-tab" onclick="showMW(this,'mw-Scalar')">Scalar</button>
       <button class="mw-tab" onclick="showMW(this,'mw-ws')">WebSocket</button>
     </div>
 
@@ -1574,26 +1574,26 @@ router.Use(middleware.SecurityMiddleware(middleware.SecurityOptions{
 }))</pre></div>
     </div>
 
-    <div id="mw-swagger" class="mw-panel">
-      <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>router.Use(middleware.SwaggerMiddleware(router, middleware.SwaggerOptions{
+    <div id="mw-Scalar" class="mw-panel">
+      <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>router.Use(middleware.ScalarMiddleware(router, middleware.ScalarOptions{
     Title:    "My API",
     Version:  "1.0.0",
-    JSONPath: "/swagger.json",
-    UIPath:   "/swagger",
+    JSONPath: "/Scalar.json",
+    UIPath:   "/Scalar",
 }))
 
 router.Handle(breeze.POST, "/users", createUser,
-    middleware.DocPOST("/users", swagger.RouteDoc{
+    middleware.DocPOST("/users", Scalar.RouteDoc{
         Title: "Create user",
         Tags:  []string{"Users"},
-        Input: []swagger.InputGroup{
-            {Type: swagger.InputBody, Fields: CreateUserRequest{}, Required: true},
+        Input: []Scalar.InputGroup{
+            {Type: Scalar.InputBody, Fields: CreateUserRequest{}, Required: true},
         },
         Output:       UserResponse{},
         OutputStatus: 201,
     }),
 )
-// Visit /swagger → live Swagger UI</pre></div>
+// Visit /Scalar → live Scalar UI</pre></div>
     </div>
 
     <div id="mw-ws" class="mw-panel">
@@ -1723,26 +1723,26 @@ router.Use(cache.ETagMiddleware())</pre></div>
 // Sets Content-Encoding: br / gzip / deflate automatically</pre></div>
   </section>
 
-  <section class="doc-section reveal" id="doc-mw-swagger">
-    <h2 class="section-title">Swagger / OpenAPI 3.1 <span class="badge">new</span></h2>
+  <section class="doc-section reveal" id="doc-mw-Scalar">
+    <h2 class="section-title">Scalar / OpenAPI 3.1 <span class="badge">new</span></h2>
     <p>Annotate routes at registration time using Go structs. No YAML, no code generation, no build step.</p>
     <div class="code-block"><div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>type CreateUserRequest struct {
     Name  string `json:"name"  description:"Full name"    example:"Alice"`
     Email string `json:"email" description:"Email address" example:"alice@example.com"`
 }
 
-router.Use(middleware.SwaggerMiddleware(router, middleware.SwaggerOptions{
+router.Use(middleware.ScalarMiddleware(router, middleware.ScalarOptions{
     Title:    "Users API",
     Version:  "2.0.0",
-    JSONPath: "/swagger.json",
-    UIPath:   "/swagger",
+    JSONPath: "/Scalar.json",
+    UIPath:   "/Scalar",
 }))
 
 router.Handle(breeze.POST, "/users", createUser,
-    middleware.DocPOST("/users", swagger.RouteDoc{
+    middleware.DocPOST("/users", Scalar.RouteDoc{
         Title:        "Create user",
         Tags:         []string{"Users"},
-        Input:        []swagger.InputGroup{{Type: swagger.InputBody, Fields: CreateUserRequest{}, Required: true}},
+        Input:        []Scalar.InputGroup{{Type: Scalar.InputBody, Fields: CreateUserRequest{}, Required: true}},
         Output:       UserResponse{},
         OutputStatus: 201,
     }),
@@ -1750,10 +1750,10 @@ router.Handle(breeze.POST, "/users", createUser,
     <div class="table-wrap"><table>
       <thead><tr><th>Constant</th><th>Source</th><th>OpenAPI Location</th></tr></thead>
       <tbody>
-        <tr><td><code>swagger.InputBody</code></td><td>JSON request body</td><td>requestBody</td></tr>
-        <tr><td><code>swagger.InputQuery</code></td><td>URL query params</td><td>query</td></tr>
-        <tr><td><code>swagger.InputParams</code></td><td>Path parameters</td><td>path</td></tr>
-        <tr><td><code>swagger.InputHeader</code></td><td>Request headers</td><td>header</td></tr>
+        <tr><td><code>Scalar.InputBody</code></td><td>JSON request body</td><td>requestBody</td></tr>
+        <tr><td><code>Scalar.InputQuery</code></td><td>URL query params</td><td>query</td></tr>
+        <tr><td><code>Scalar.InputParams</code></td><td>Path parameters</td><td>path</td></tr>
+        <tr><td><code>Scalar.InputHeader</code></td><td>Request headers</td><td>header</td></tr>
       </tbody>
     </table></div>
   </section>
@@ -2038,7 +2038,7 @@ func main() {
 
   <section class="doc-section reveal" id="doc-dash-api">
     <h2 class="section-title">API Explorer</h2>
-    <p>A built-in alternative to Postman or Swagger UI. Pick any route from the Routes Explorer, fill in path params, query string, headers and a JSON body, and click <strong>Send</strong>. The dashboard issues the request through the same gnet event loop your real traffic uses, so what you measure is what your users get.</p>
+    <p>A built-in alternative to Postman or Scalar UI. Pick any route from the Routes Explorer, fill in path params, query string, headers and a JSON body, and click <strong>Send</strong>. The dashboard issues the request through the same gnet event loop your real traffic uses, so what you measure is what your users get.</p>
     <p>Every sent request can be exported as a ready-to-run code snippet in six languages. Use the language tabs above the response panel.</p>
     <div class="mw-tabs">
       <button class="mw-tab active" onclick="showMW(this,'dash-api-curl')">curl</button>
