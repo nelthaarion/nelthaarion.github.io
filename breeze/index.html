@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><style>body {transition: opacity ease-in 0.2s; } 
-body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
-</style>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Breeze — High-Performance HTTP Framework for Go</title>
@@ -513,6 +511,7 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
     <a href="#doc-install">Docs</a>
     <a href="#performance">Benchmarks</a>
     <a href="#doc-template">Template Engine</a>
+    <a href="#doc-grpc-overview">gRPC</a>
     <a href="#doc-dash-overview">Dashboard</a>
     <a href="https://github.com/nelthaarion/breeze" class="gh-link" target="_blank">GitHub →</a>
   </nav>
@@ -591,6 +590,17 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
   </div>
 
   <div class="sidebar-group">
+    <div class="sidebar-label">gRPC <span class="badge" style="background:rgba(124,131,253,.15);color:var(--accent);border:1px solid rgba(124,131,253,.25);padding:.05rem .35rem;border-radius:4px;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;margin-left:.3rem">new</span></div>
+    <ul class="sidebar-list">
+      <li><a href="#doc-grpc-overview">Overview</a></li>
+      <li><a href="#doc-grpc-annotations">Call Type Annotations</a></li>
+      <li><a href="#doc-grpc-generate">Generating a Service</a></li>
+      <li><a href="#doc-grpc-output">Generated Files</a></li>
+      <li><a href="#doc-grpc-example">Full Example</a></li>
+    </ul>
+  </div>
+
+  <div class="sidebar-group">
     <div class="sidebar-label">Dashboard <span class="badge" style="background:rgba(124,131,253,.15);color:var(--accent);border:1px solid rgba(124,131,253,.25);padding:.05rem .35rem;border-radius:4px;font-size:.6rem;letter-spacing:.06em;text-transform:uppercase;margin-left:.3rem">new</span></div>
     <ul class="sidebar-list">
       <li><a href="#doc-dash-overview">Overview</a></li>
@@ -658,11 +668,11 @@ body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relati
     <h2 class="section-title">3× faster. Not a typo.</h2>
     <p class="section-desc">Measured on a simple JSON endpoint, same machine, same payload.</p>
     <ul class="bench-list">
-      <li><span class="bench-name">Breeze</span><div class="bench-bar-wrap"><div class="bench-bar" style="width: 0px;" data-target="100%"></div></div><span class="bench-val">~630k req/s</span></li>
-      <li><span class="bench-name">Fiber</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="33%"></div></div><span class="bench-val">~210k req/s</span></li>
-      <li><span class="bench-name">Echo</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="22%"></div></div><span class="bench-val">~140k req/s</span></li>
-      <li><span class="bench-name">Gin</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="19%"></div></div><span class="bench-val">~120k req/s</span></li>
-      <li><span class="bench-name">net/http</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="13%"></div></div><span class="bench-val">~85k req/s</span></li>
+      <li><span class="bench-name">Breeze</span><div class="bench-bar-wrap"><div class="bench-bar" style="width: 0px;" data-target="0px"></div></div><span class="bench-val">~630k req/s</span></li>
+      <li><span class="bench-name">Fiber</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="0px"></div></div><span class="bench-val">~210k req/s</span></li>
+      <li><span class="bench-name">Echo</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="0px"></div></div><span class="bench-val">~140k req/s</span></li>
+      <li><span class="bench-name">Gin</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="0px"></div></div><span class="bench-val">~120k req/s</span></li>
+      <li><span class="bench-name">net/http</span><div class="bench-bar-wrap"><div class="bench-bar dim" style="width: 0px;" data-target="0px"></div></div><span class="bench-val">~85k req/s</span></li>
     </ul>
     <p style="font-size:.8rem;margin-top:.75rem">* Approximate. Run benchmarks in your environment for authoritative numbers.</p>
   </section>
@@ -882,7 +892,7 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     <div class="tmpl-flow">
       <div class="tmpl-step"><div class="tmpl-step-num">1</div><h4>Parse</h4><p>Views, components, and layout are parsed once at startup (or per-request in dev mode).</p></div>
       <div class="tmpl-step"><div class="tmpl-step-num">2</div><h4>Render</h4><p>A handler calls <code>ctx.Render</code> or <code>router.View</code>. Data is passed as any Go value.</p></div>
-      <div class="tmpl-step"><div class="tmpl-step-num">3</div><h4>Layout wrap</h4><p>The view is embedded inside the layout via <code>{{"{{"}}template "content" .{{"}}"}}</code>. Components are injected inline.</p></div>
+      <div class="tmpl-step"><div class="tmpl-step-num">3</div><h4>Layout wrap</h4><p>The view is embedded inside the layout via <code>{{template "content" .}}</code>. Components are injected inline.</p></div>
       <div class="tmpl-step"><div class="tmpl-step-num">4</div><h4>SPA inject</h4><p>The runtime script, page data JSON, and template sources are injected just before <code>&lt;/body&gt;</code>.</p></div>
       <div class="tmpl-step"><div class="tmpl-step-num">5</div><h4>Navigate</h4><p>Link clicks fetch a partial (content block only). The client swaps <code>#breeze-app</code> without a full reload.</p></div>
     </div>
@@ -935,17 +945,17 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
       <br>
       public/                 <span class="cm">← static assets (CSS, images, JS)</span>
     </div>
-    <p>Every component file uses <code>{{"{{"}}define "name"{{"}}"}}…{{"{{"}}end{{"}}"}}</code>. View files use <code>{{"{{"}}define "content"{{"}}"}}…{{"{{"}}end{{"}}"}}</code>. The layout file uses <code>{{"{{"}}define "layout"{{"}}"}}…{{"{{"}}end{{"}}"}}</code>.</p>
+    <p>Every component file uses <code>{{define "name"}}…{{end}}</code>. View files use <code>{{define "content"}}…{{end}}</code>. The layout file uses <code>{{define "layout"}}…{{end}}</code>.</p>
   </section>
 
   <section class="doc-section reveal" id="doc-tmpl-views">
     <h2 class="section-title">Views &amp; Layout</h2>
-    <p>A <strong>view</strong> is a <code>.html</code> file inside <code>ViewsDir</code> that defines a <code>"content"</code> block. The <strong>layout</strong> wraps every view by embedding that block via <code>{{"{{"}}template "content" .{{"}}"}}</code>.</p>
+    <p>A <strong>view</strong> is a <code>.html</code> file inside <code>ViewsDir</code> that defines a <code>"content"</code> block. The <strong>layout</strong> wraps every view by embedding that block via <code>{{template "content" .}}</code>.</p>
 
     <h3 class="sub-title">Layout file — <code>views/layout.html</code></h3>
     <div class="code-block">
       <div class="code-header"><span>html</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-      <pre>{{"{{"}}define "layout"{{"}}"}}
+      <pre>{{define "layout"}}
 &lt;!DOCTYPE html&gt;
 &lt;html lang="en"&gt;
 &lt;head&gt;
@@ -954,13 +964,13 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
   &lt;link rel="stylesheet" href="/public/app.css"&gt;
 &lt;/head&gt;
 &lt;body&gt;
-  {{"{{"}}component "nav" .{{"}}"}}
+  {{component "nav" .}}
   &lt;div id="breeze-app"&gt;
-    {{"{{"}}template "content" .{{"}}"}}    &lt;!-- view content goes here --&gt;
+    {{template "content" .}}    &lt;!-- view content goes here --&gt;
   &lt;/div&gt;
 &lt;/body&gt;
 &lt;/html&gt;
-{{"{{"}}end{{"}}"}}</pre>
+{{end}}</pre>
     </div>
 
     <div class="callout">
@@ -970,19 +980,19 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     <h3 class="sub-title">View file — <code>views/home.html</code></h3>
     <div class="code-block">
       <div class="code-header"><span>html</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-      <pre>{{"{{"}}define "content"{{"}}"}}
+      <pre>{{define "content"}}
 &lt;div class="page"&gt;
-  &lt;h1&gt;Welcome, {{"{{"}} .Data.Name {{"}}"}}!&lt;/h1&gt;
+  &lt;h1&gt;Welcome, {{ .Data.Name }}!&lt;/h1&gt;
 
-  {{"{{"}}component "card" (map "title" "Hello" "body" "World"){{"}}"}}&lt;!-- component with inline data --&gt;
+  {{component "card" (map "title" "Hello" "body" "World")}}&lt;!-- component with inline data --&gt;
 
   &lt;ul&gt;
-  {{"{{"}}range .Data.Items{{"}}"}}
-    &lt;li&gt;{{"{{"}} .Name {{"}}"}} — ${{"{{"}} .Price {{"}}"}}&lt;/li&gt;
-  {{"{{"}}end{{"}}"}}
+  {{range .Data.Items}}
+    &lt;li&gt;{{ .Name }} — ${{ .Price }}&lt;/li&gt;
+  {{end}}
   &lt;/ul&gt;
 &lt;/div&gt;
-{{"{{"}}end{{"}}"}}</pre>
+{{end}}</pre>
     </div>
 
     <p>Inside templates, <code>.Data</code> holds the value returned by your handler's data function. The outer <code>.</code> is a <code>TemplateData</code> struct which also exposes <code>.IsPartial</code>.</p>
@@ -1003,17 +1013,17 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
 
   <section class="doc-section reveal" id="doc-tmpl-components">
     <h2 class="section-title">Components</h2>
-    <p>Components are reusable HTML fragments that live in <code>ComponentsDir</code>. Each file defines a named template block using <code>{{"{{"}}define "name"{{"}}"}}…{{"{{"}}end{{"}}"}}</code>.</p>
+    <p>Components are reusable HTML fragments that live in <code>ComponentsDir</code>. Each file defines a named template block using <code>{{define "name"}}…{{end}}</code>.</p>
 
     <h3 class="sub-title">Component file — <code>components/card.html</code></h3>
     <div class="code-block">
       <div class="code-header"><span>html</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
-      <pre>{{"{{"}}define "card"{{"}}"}}
+      <pre>{{define "card"}}
 &lt;div class="card"&gt;
-  &lt;h3&gt;{{"{{"}} .title {{"}}"}}&lt;/h3&gt;
-  &lt;p&gt;{{"{{"}} .body {{"}}"}}&lt;/p&gt;
+  &lt;h3&gt;{{ .title }}&lt;/h3&gt;
+  &lt;p&gt;{{ .body }}&lt;/p&gt;
 &lt;/div&gt;
-{{"{{"}}end{{"}}"}}</pre>
+{{end}}</pre>
     </div>
 
     <h3 class="sub-title">Using a component inside a view</h3>
@@ -1021,16 +1031,16 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
     <div class="code-block">
       <div class="code-header"><span>html</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
       <pre>&lt;!-- Pass the parent data straight through --&gt;
-{{"{{"}}component "nav" .{{"}}"}}
+{{component "nav" .}}
 
 &lt;!-- Build a map inline with the map helper --&gt;
-{{"{{"}}component "card" (map "title" "Hello" "body" "World"){{"}}"}}
+{{component "card" (map "title" "Hello" "body" "World")}}
 
 &lt;!-- Pass a field from your page data --&gt;
-{{"{{"}}component "stats" .Data.StatsPayload{{"}}"}}
+{{component "stats" .Data.StatsPayload}}
 
 &lt;!-- partial is an alias for component --&gt;
-{{"{{"}}partial "card" (map "title" "Alt syntax" "body" "Same thing"){{"}}"}}</pre>
+{{partial "card" (map "title" "Alt syntax" "body" "Same thing")}}</pre>
     </div>
 
     <h3 class="sub-title">Rendering a component from a handler</h3>
@@ -1078,8 +1088,8 @@ all := ctx.GetParams()            // map[string]string (copy)</pre>
 })
 
 // Use in a template:
-// {{"{{"}}upper .Data.Name{{"}}"}}
-// {{"{{"}}format .Data.CreatedAt{{"}}"}}</pre>
+// {{upper .Data.Name}}
+// {{format .Data.CreatedAt}}</pre>
     </div>
   </section>
 
@@ -1157,7 +1167,7 @@ const name = breeze.data("name"); // "Alice"</pre>
     <ul class="doc-list">
       <li>Every <code>&lt;a href="…"&gt;</code> click is intercepted by a document-level event listener.</li>
       <li>The runtime sends a <code>fetch()</code> to the same URL with the header <code>X-Breeze-Partial: true</code>.</li>
-      <li>The server detects the header and returns <strong>only the <code>{{"{{"}}define "content"{{"}}"}}…{{"{{"}}end{{"}}"}}</code> block</strong> — no layout, no runtime script.</li>
+      <li>The server detects the header and returns <strong>only the <code>{{define "content"}}…{{end}}</code> block</strong> — no layout, no runtime script.</li>
       <li>The client replaces <code>#breeze-app</code>'s <code>innerHTML</code> with the fragment and calls <code>history.pushState</code>.</li>
       <li>The browser URL updates; back/forward navigation is handled via <code>popstate</code>.</li>
     </ul>
@@ -1447,7 +1457,7 @@ document.querySelector('#stats-box').innerHTML = await res.text();</pre>
     </div>
 
     <div class="callout">
-      <p><strong>Client-side template evaluation:</strong> Breeze embeds the raw source of every view and component in the page as a JSON blob (<code>&lt;script id="__breeze_tmpl__" type="application/json"&gt;</code>). <code>breeze.render()</code> checks this first and evaluates the template locally using a built-in Go-template subset interpreter — supporting <code>{{"{{"}} .Field {{"}}"}}</code>, <code>{{"{{"}}range …{{"}}"}}…{{"{{"}}end{{"}}"}}</code>, <code>{{"{{"}}if …{{"}}"}}…{{"{{"}}end{{"}}"}}</code>, and nested <code>component</code> / <code>partial</code> calls. Only if the template is not embedded does it fall back to the server.</p>
+      <p><strong>Client-side template evaluation:</strong> Breeze embeds the raw source of every view and component in the page as a JSON blob (<code>&lt;script id="__breeze_tmpl__" type="application/json"&gt;</code>). <code>breeze.render()</code> checks this first and evaluates the template locally using a built-in Go-template subset interpreter — supporting <code>{{ .Field }}</code>, <code>{{range …}}…{{end}}</code>, <code>{{if …}}…{{end}}</code>, and nested <code>component</code> / <code>partial</code> calls. Only if the template is not embedded does it fall back to the server.</p>
     </div>
   </section>
 
@@ -1863,6 +1873,156 @@ hub2 := app.WebSocket("/ws/events", eventsHandler)
     </table></div>
   </section>
 
+  <!-- ── gRPC ──────────────────────────────────────────────────────────── -->
+  <section class="doc-section reveal" id="doc-grpc-overview">
+    <h2 class="section-title">gRPC Code Generation <span class="badge">new</span></h2>
+    <p class="section-desc">Breeze's CLI generates gRPC server and client scaffolding directly from a plain Go interface — no <code>.proto</code> file, no naming convention on your methods. Point it at any interface declared in a <code>*_grpc.go</code> file, annotate each method with a <code>grpc_type</code> comment, and run one command.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <span class="fi">🔎</span>
+        <h4>Convention-free detection</h4>
+        <p>Any interface inside a file matching <code>*_grpc.go</code> is treated as a service definition — no base interface or tag required.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">🏷</span>
+        <h4>Annotation-driven call style</h4>
+        <p>A <code>grpc_type</code> comment above each method decides whether it's generated as unary, streaming, or bidirectional.</p>
+      </div>
+      <div class="feature-card">
+        <span class="fi">🧩</span>
+        <h4>Server, client &amp; adapters</h4>
+        <p>One command generates the server stub, client wrapper, and the adapter glue code that wires the service into your app.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-grpc-annotations">
+    <h2 class="section-title">Call Type Annotations</h2>
+    <p>Breeze doesn't infer streaming behaviour from method signatures or naming — it reads an explicit <code>grpc_type</code> comment directly above the method. This keeps generation predictable even as your interface grows.</p>
+
+    <div class="table-wrap"><table>
+      <thead><tr><th>grpc_type</th><th>Client → Server</th><th>Server → Client</th><th>Typical use</th></tr></thead>
+      <tbody>
+        <tr><td><code>Unary</code></td><td>single request</td><td>single response</td><td>Standard RPC call — request in, response out.</td></tr>
+        <tr><td><code>ServerSideStreaming</code></td><td>single request</td><td>stream of responses</td><td>Live feeds, paginated results, subscriptions.</td></tr>
+        <tr><td><code>ClientSideStreaming</code></td><td>stream of requests</td><td>single response</td><td>Uploads, batched writes, aggregation.</td></tr>
+        <tr><td><code>Bidirectional</code></td><td>stream of requests</td><td>stream of responses</td><td>Chat, real-time sync, duplex protocols.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-grpc-generate">
+    <h2 class="section-title">Generating a Service</h2>
+    <p>Define your service as a regular Go interface in a file ending in <code>_grpc.go</code>. Annotate each method with its call type:</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>// user_grpc.go
+package services
+
+// grpc_type: Unary
+type UserService interface {
+    GetUser(ctx context.Context, req *GetUserRequest) (*UserResponse, error)
+
+    // grpc_type: ServerSideStreaming
+    WatchUser(ctx context.Context, req *GetUserRequest, stream UserService_WatchUserServer) error
+
+    // grpc_type: ClientSideStreaming
+    BatchCreateUsers(stream UserService_BatchCreateUsersServer) error
+
+    // grpc_type: Bidirectional
+    SyncUsers(stream UserService_SyncUsersServer) error
+}</pre>
+    </div>
+
+    <p>Then run the generator against the interface name:</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>shell</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>breeze generate grpc UserService
+
+# overwrite previously generated files for this interface
+breeze generate grpc UserService --force</pre>
+    </div>
+
+    <div class="table-wrap"><table>
+      <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><code>--force</code></td><td>Overwrite existing generated files for this interface instead of failing when they already exist.</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-grpc-output">
+    <h2 class="section-title">Generated Files</h2>
+    <p>Generation is driven by <code>generate_grpc.go</code> (detection and parsing), with output split across a small set of purpose-built files so hand-written code and generated code never collide:</p>
+
+    <div class="table-wrap"><table>
+      <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+      <tbody>
+        <tr><td><code>generate_grpc.go</code></td><td>Scans for <code>*_grpc.go</code> files, parses interfaces and their <code>grpc_type</code> annotations.</td></tr>
+        <tr><td><code>generate_grpc_files.go</code></td><td>Emits the generated server/client Go source files to disk.</td></tr>
+        <tr><td><code>generate_grpc_adapters.go</code></td><td>Generates the adapter glue that wires the service into a Breeze <code>*Router</code>.</td></tr>
+        <tr><td><code>generate_grpc_tags.go</code></td><td>Parses and validates <code>grpc_type</code> tag values.</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="callout info">
+      <p>Regenerating for the same interface replaces its previously generated block — safe to re-run after adding or changing methods. Pass <code>--force</code> to overwrite files that already exist on disk.</p>
+    </div>
+  </section>
+
+  <section class="doc-section reveal" id="doc-grpc-example">
+    <h2 class="section-title">Full Example</h2>
+    <p>A minimal unary service, generated and mounted alongside your normal HTTP routes:</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>// user_grpc.go
+package services
+
+// grpc_type: Unary
+type UserService interface {
+    GetUser(ctx context.Context, req *GetUserRequest) (*UserResponse, error)
+}</pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span>shell</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>breeze generate grpc UserService</pre>
+    </div>
+
+    <p>Mount the generated adapter the same way you'd wire up any other service:</p>
+
+    <div class="code-block">
+      <div class="code-header"><span>go</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre>package main
+
+import (
+    "runtime"
+
+    "github.com/nelthaarion/breeze"
+    "myapp/services"
+)
+
+func main() {
+    router := breeze.NewRouter()
+
+    userSvc := services.NewUserServiceServer(&services.UserServiceImpl{})
+    userSvc.Register(router) // generated adapter wires gRPC handlers in
+
+    pool := breeze.NewWorkerPool(runtime.NumCPU())
+    app  := breeze.New(router, pool)
+    app.Run(3000, true)
+}</pre>
+    </div>
+
+    <div class="callout">
+      <p><strong>Note:</strong> the constructor / <code>Register</code> call names above follow the same pattern as the existing <code>resource</code>/<code>handler</code> generators (generated file + explicit registration call). Verify the exact generated symbol names against <code>generate_grpc_adapters.go</code>'s output before publishing.</p>
+    </div>
+  </section>
+
   <!-- ── Dashboard ──────────────────────────────────────────────────────── -->
   <section class="doc-section reveal" id="doc-dash-overview">
     <h2 class="section-title">Developer Dashboard <span class="badge">new</span></h2>
@@ -2027,7 +2187,7 @@ func main() {
         <tr><td><code>Method · Pattern</code></td><td>HTTP method and route pattern, with <code>:param</code> and <code>*wildcard</code> segments highlighted</td></tr>
         <tr><td><code>Calls</code></td><td>Total invocations since process start</td></tr>
         <tr><td><code>p50 / p95 / p99</code></td><td>Latency quantiles, computed from a 5-minute sliding window</td></tr>
-        <tr><td><code>Errors</code></td><td>Responses with status <code>&ge; 500</code>, with a percentage of total calls</td></tr>
+        <tr><td><code>Errors</code></td><td>Responses with status <code>≥ 500</code>, with a percentage of total calls</td></tr>
         <tr><td><code>Last</code></td><td>Time since the most recent invocation</td></tr>
       </tbody>
     </table></div>
@@ -2089,13 +2249,13 @@ var resp = await http.PostAsJsonAsync(
     <div class="mw-panel" id="dash-api-php">
       <div class="code-block"><div class="code-header"><span>php</span><button class="copy-btn" onclick="copyCode(this)">copy</button></div><pre>$ch = curl_init("https://api.example.com/users");
 curl_setopt_array($ch, [
-    CURLOPT_POST => true,
-    CURLOPT_HTTPHEADER => [
+    CURLOPT_POST =&gt; true,
+    CURLOPT_HTTPHEADER =&gt; [
         "Authorization: Bearer $token",
         "Content-Type: application/json",
     ],
-    CURLOPT_POSTFIELDS => json_encode([
-        "name" => "Ada", "email" => "ada@lovelace.dev",
+    CURLOPT_POSTFIELDS =&gt; json_encode([
+        "name" =&gt; "Ada", "email" =&gt; "ada@lovelace.dev",
     ]),
 ]);
 curl_exec($ch);</pre></div>
@@ -2199,7 +2359,7 @@ dash.RegisterORM(breezeorm.NewAdapter(db, breezeorm.Config{
       <tbody>
         <tr><td><strong>App</strong></td><td><code>log.Printf</code> / <code>breeze.Log</code> output captured via <code>log.SetOutput</code></td><td>2,048 lines</td></tr>
         <tr><td><strong>HTTP</strong></td><td>One entry per handled request, written by the <code>LoggingMiddleware</code></td><td>4,096 lines</td></tr>
-        <tr><td><strong>Errors</strong></td><td>Application-returned responses with status <code>&ge; 500</code></td><td>1,024 lines</td></tr>
+        <tr><td><strong>Errors</strong></td><td>Application-returned responses with status <code>≥ 500</code></td><td>1,024 lines</td></tr>
         <tr><td><strong>Panics</strong></td><td>Recovered panics from <code>RecoveryMiddleware</code> or the worker pool, with stack traces</td><td>512 lines</td></tr>
         <tr><td><strong>Warnings</strong></td><td>Slow queries, N+1 detections, idle-in-transaction, etc.</td><td>1,024 lines</td></tr>
       </tbody>
@@ -2429,8 +2589,6 @@ app := breeze.New(router, nil)</pre></div>
       : 'none';
   }, { passive: true });
 </script>
-
-
 
 </body>
 </html>
