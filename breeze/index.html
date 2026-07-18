@@ -8,34 +8,40 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-    --bg:        #f7f8fa;
-    --surface:   #ffffff;
-    --surface-2: #f0f2f6;
-    --border:    #e2e6ee;
-    --border-soft: #eceff5;
-    --text:      #111827;
-    --text-2:    #374151;
-    --text-3:    #6b7280;
-    --text-4:    #9ca3af;
-    --accent:    #2563eb;
-    --accent-bg: #eff4ff;
-    --accent-bd: #c7d7fd;
-    --green:     #16a34a;
-    --green-bg:  #f0fdf4;
-    --purple:    #7c3aed;
-    --purple-bg: #f5f3ff;
-    --amber:     #d97706;
-    --amber-bg:  #fffbeb;
-    --red:       #dc2626;
-    --red-bg:    #fef2f2;
-    --sidebar-w: 260px;
-    --top-h:     56px;
-    --mono:      'JetBrains Mono', 'Fira Code', monospace;
-    --sans:      'Inter', -apple-system, sans-serif;
-    --radius:    8px;
-    --radius-lg: 12px;
-  }
+      --bg:         #f7f8fc;
+      --surface:    #ffffff;
+      --border:     #e2e4f0;
+      --accent:     #5b62e0;
+      --accent2:    #0f9d7c;
+      --text:       #1a1c2e;
+      --muted:      #666b85;
+      --code-bg:    #f1f2f8;
+      --topbar-bg:  rgba(255,255,255,.75);
+      --sidebar-bg: rgba(255,255,255,.9);
+      --footer-bg:  rgba(241,242,248,.6);
+      --overlay-1:  rgba(10,12,25,.03);
+      --card-shadow: rgba(30,34,60,.12);
+      --sidebar-w: 240px;
+      --top-h:     56px;
+    }
 
+    [data-theme="dark"] {
+      --bg:         #0d0f1a;
+      --surface:    #141624;
+      --border:     #232540;
+      --accent:     #7c83fd;
+      --accent2:    #5ce8c0;
+      --text:       #e4e6f0;
+      --muted:      #8a8fa8;
+      --code-bg:    #0a0c14;
+      --topbar-bg:  rgba(13,15,26,.75);
+      --sidebar-bg: rgba(20,22,36,.9);
+      --footer-bg:  rgba(20,22,36,.4);
+      --overlay-1:  rgba(255,255,255,.02);
+      --card-shadow: rgba(0,0,0,.25);
+    }
+
+    body { transition: background-color .25s ease, color .25s ease; }
 
     html { scroll-behavior: smooth; }
     body {
@@ -64,10 +70,10 @@
     .topbar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       height: var(--top-h);
-      background: rgba(13,15,26,.75);
+      background: var(--topbar-bg);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(35,37,64,.7);
+      border-bottom: 1px solid var(--border);
       display: flex; align-items: center; padding: 0 1.5rem; gap: 1.5rem;
       transition: background .3s;
     }
@@ -93,6 +99,30 @@
       transform: translateY(-1px);
     }
 
+    .theme-toggle {
+      display: flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      transition: color .2s, border-color .2s, background .2s, transform .15s;
+      padding: 0;
+    }
+    .theme-toggle:hover {
+      color: var(--accent);
+      border-color: rgba(124,131,253,.4);
+      transform: translateY(-1px);
+    }
+    .theme-toggle .icon-sun,
+    .theme-toggle .icon-moon {
+      display: none;
+    }
+    :root .theme-toggle .icon-sun { display: block; }
+    [data-theme="dark"] .theme-toggle .icon-moon { display: block; }
+    [data-theme="dark"] .theme-toggle .icon-sun { display: none; }
+
     /* ── Layout ──────────────────────────────────────────────────────────── */
     .layout {
       display: flex;
@@ -107,7 +137,7 @@
       left: 0;
       bottom: 0;
       width: var(--sidebar-w);
-      background: rgba(20,22,36,.9);
+      background: var(--sidebar-bg);
       backdrop-filter: blur(8px);
       border-right: 1px solid var(--border);
       padding: 1.5rem 0;
@@ -299,7 +329,7 @@
     }
     .code-block:hover {
       border-color: rgba(124,131,253,.3);
-      box-shadow: 0 4px 24px rgba(0,0,0,.25);
+      box-shadow: 0 4px 24px var(--card-shadow);
     }
     .code-header {
       display: flex; align-items: center; justify-content: space-between;
@@ -307,7 +337,7 @@
       border-bottom: 1px solid var(--border);
       font-size: .75rem; color: var(--muted);
       font-family: monospace;
-      background: rgba(255,255,255,.02);
+      background: var(--overlay-1);
     }
     .copy-btn {
       background: none; border: 1px solid transparent; cursor: pointer;
@@ -343,11 +373,11 @@
       color: var(--muted); font-weight: 600; font-size: .75rem;
       letter-spacing: .05em; text-transform: uppercase;
       border-bottom: 1px solid var(--border);
-      background: rgba(255,255,255,.02);
+      background: var(--overlay-1);
     }
     td {
       padding: .6rem .9rem;
-      border-bottom: 1px solid rgba(35,37,64,.6);
+      border-bottom: 1px solid var(--border);
       color: var(--muted);
       vertical-align: top;
       transition: background .15s;
@@ -395,7 +425,7 @@
     .feature-card:hover {
       border-color: rgba(124,131,253,.35);
       transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(0,0,0,.25), 0 0 0 1px rgba(124,131,253,.1);
+      box-shadow: 0 8px 32px var(--card-shadow), 0 0 0 1px rgba(124,131,253,.1);
     }
     .feature-card:hover::before { opacity: 1; }
     .feature-card .fi { font-size: 1.4rem; margin-bottom: .5rem; display: block; }
@@ -408,7 +438,7 @@
     .bench-name { min-width: 100px; font-size: .875rem; color: var(--text); }
     .bench-bar-wrap {
       flex: 1; height: 8px;
-      background: rgba(35,37,64,.8);
+      background: var(--border);
       border-radius: 4px; overflow: hidden;
     }
     .bench-bar {
@@ -448,7 +478,7 @@
       display: flex; justify-content: space-between; align-items: center;
       font-size: .8rem; color: var(--muted);
       flex-wrap: wrap; gap: .5rem;
-      background: rgba(20,22,36,.4);
+      background: var(--footer-bg);
     }
     footer a { color: var(--muted); text-decoration: none; transition: color .2s; }
     footer a:hover { color: var(--accent); }
@@ -518,6 +548,17 @@
       .hero::before { width: 340px; }
     }
   </style>
+  <script>
+    // Applied before paint so there's no flash of the wrong theme.
+    // Default is light — dark is only applied if the person chose it before.
+    (function () {
+      try {
+        if (localStorage.getItem('breeze-theme') === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
 
@@ -530,6 +571,10 @@
     <a href="#doc-template">Template Engine</a>
     <a href="#doc-grpc-overview">gRPC</a>
     <a href="#doc-dash-overview">Dashboard</a>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    </button>
     <a href="https://github.com/nelthaarion/breeze" class="gh-link" target="_blank">GitHub →</a>
   </nav>
 </header>
@@ -2521,6 +2566,20 @@ app := breeze.New(router, nil)</pre></div>
 </footer>
 
 <script>
+  // ── Theme toggle ──────────────────────────────────────────────────────
+  // Default theme is light. Preference is remembered in localStorage.
+  function toggleTheme() {
+    const root = document.documentElement;
+    const isDark = root.getAttribute('data-theme') === 'dark';
+    if (isDark) {
+      root.removeAttribute('data-theme');
+      try { localStorage.setItem('breeze-theme', 'light'); } catch (e) {}
+    } else {
+      root.setAttribute('data-theme', 'dark');
+      try { localStorage.setItem('breeze-theme', 'dark'); } catch (e) {}
+    }
+  }
+
   // ── Copy buttons ────────────────────────────────────────────────────────
   function copyCode(btn) {
     const pre = btn.closest('.code-block').querySelector('pre');
