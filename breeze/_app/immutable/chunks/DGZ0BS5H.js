@@ -1,0 +1,1 @@
+import{H as e}from"./BgsmUUjA.js";e();var t=`https://breeze-framework.dev`,n=`Breeze Docs`;export{t as n,n as t};
