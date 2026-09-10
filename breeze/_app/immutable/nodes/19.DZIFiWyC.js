@@ -69,7 +69,7 @@ which Docker rejects.</p> <h2 id="the-report-the-framework-gives-about-itself">T
 needs most — because <code>breeze_diagnose_service</code> reads this same registry, so
 the endpoint serving the call was previously the one subsystem missing from
 its own report. It surfaces three states no error anywhere else reveals: a
-scope withholding a tool, generator mode running with no source tree, and <code>AllowWorkspaceTools</code> left on in production. See <strong><a href="/docs/diagnostics/">Diagnostics</a></strong>.</p> <h2 id="the-five-layers-together">The five layers, together<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#the-five-layers-together">#</a></h2> <p><code>--mode</code> (what exists) → <code>--scope</code> (what a token reaches) → <code>--workspace</code> (where it may act on disk) → transport (stdio / network /
+scope withholding a tool, generator mode running with no source tree, and <code>AllowWorkspaceTools</code> left on in production. See <strong><a href="/breeze/docs/diagnostics/">Diagnostics</a></strong>.</p> <h2 id="the-five-layers-together">The five layers, together<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#the-five-layers-together">#</a></h2> <p><code>--mode</code> (what exists) → <code>--scope</code> (what a token reaches) → <code>--workspace</code> (where it may act on disk) → transport (stdio / network /
 in-process) → provisioning boundaries (what a spawned container itself can
 reach). Each layer is independent and each is reported back to the client
 at handshake time, so a missing capability can always be attributed to the

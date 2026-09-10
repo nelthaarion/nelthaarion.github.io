@@ -2,18 +2,18 @@ import{N as e,U as t,_ as n,d as r,h as i,j as a}from"../chunks/BgsmUUjA.js";imp
 buckets, dynamic <code>:params</code>, and wildcard segments, with O(1) lookup for the
 common case.</p> <!> <h2 id="registering-routes">Registering routes<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#registering-routes">#</a></h2> <table><thead><tr><th>Method</th><th>Runs on</th></tr></thead><tbody><tr><td><code>router.Handle(method, pattern, handler, middlewares...)</code></td><td>the <code>gnet</code> event-loop goroutine, inline — the fastest path</td></tr><tr><td><code>router.HandleBlocking(method, pattern, handler, middlewares...)</code></td><td>the worker pool</td></tr></tbody></table> <!> <p>Choosing wrong doesn't crash anything — it just means a blocking call made
 inline stalls every other connection pinned to that event loop, or an
-in-memory handler pays a pool hop it didn't need. See <strong><a href="/docs/core/performance/">Performance Model</a></strong> for why inline execution is
+in-memory handler pays a pool hop it didn't need. See <strong><a href="/breeze/docs/core/performance/">Performance Model</a></strong> for why inline execution is
 the default assumption.</p> <h2 id="patterns">Patterns<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#patterns">#</a></h2> <ul><li><strong>Exact segments</strong> — <code>/users</code>, <code>/health</code></li> <li><strong>Dynamic params</strong> — <code>/users/:id</code>, read with <code>ctx.Param("id")</code></li> <li><strong>Wildcards</strong> — a trailing <code>*filepath</code>-style segment, used by <code>SetStaticDir</code> and the <code>video</code> package's mount</li></ul> <p>Route lookup is indexed per HTTP method into buckets at registration time
 (<code>indexRoute</code>), so matching a request never scans routes registered for a
 different method.</p> <h2 id="handler-signature">Handler signature<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#handler-signature">#</a></h2> <p>Every handler and every middleware share one type:</p> <!> <p>A middleware runs before the handler, calls <code>ctx.Next()</code> to continue, and
-returns an <code>error</code> — there is exactly one function type to learn. See <strong><a href="/docs/middleware/">Middleware Reference</a></strong> for the built-ins and the
+returns an <code>error</code> — there is exactly one function type to learn. See <strong><a href="/breeze/docs/middleware/">Middleware Reference</a></strong> for the built-ins and the
 order they must install in.</p> <h2 id="routeruse-and-per-route-middleware"><code>router.Use</code> and per-route middleware<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#routeruse-and-per-route-middleware">#</a></h2> <!> <p><code>Use</code> prepends to every route's chain, <strong>including routes registered before
 the <code>Use</code> call</strong> — the chain is rebuilt, so installation order in the file
 does not have to match registration order. Per-route middleware runs after
 all global middleware. The whole chain is composed once, at registration
 time, not per request — a route with no <code>:params</code> costs <strong>zero</strong> allocations to dispatch.</p> <h2 id="static-files">Static files<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#static-files">#</a></h2> <!> <p>Serves files from the given directory under a wildcard route. For anything
 that needs byte-range support — video, large downloads with seeking — use
-the dedicated <strong><a href="/docs/video/">Video Streaming</a></strong> package instead; a plain
+the dedicated <strong><a href="/breeze/docs/video/">Video Streaming</a></strong> package instead; a plain
 static handler answers <code>Range</code> requests incorrectly by silently ignoring
 them.</p> <h2 id="introspection">Introspection<a class="heading-anchor" aria-hidden="true" tabindex="-1" href="#introspection">#</a></h2> <!> <p><code>breeze routes</code> (the CLI command) reads the same information without booting
 the application. The dashboard's Routes Explorer page and the <code>scalar</code> OpenAPI generator both read from the same registration data, so a route
