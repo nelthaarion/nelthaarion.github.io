@@ -1,0 +1,52 @@
+# Breeze
+
+> Breeze is a ridiculously fast Go web framework built AI-first: a first-party MCP server gives AI agents 40 scoped tools to scaffold, verify, debug and provision a Breeze service — alongside native WebSockets, a live dashboard, an event bus, durable workflows, distributed tracing, JSON-RPC 2.0 and OpenAPI.
+
+Source: https://github.com/nelthaarion/breeze
+
+## Get Started
+
+- [Introduction](https://nelthaarion.github.io/breeze/docs/getting-started/): Install Breeze, a fast event-driven Go web framework, and build your first server in minutes. Quick start, graceful shutdown, and Docker setup.
+- [CLI & Scaffolding](https://nelthaarion.github.io/breeze/docs/cli/): Scaffold projects, generate resources, and wire in features with the breeze CLI: new, generate, add, routes, and migrate commands.
+- [Packages at a Glance](https://nelthaarion.github.io/breeze/docs/packages/): Every importable Breeze subpackage in one table: HTTP core, binding, middleware, events, workflows, dashboard, observability, and more.
+
+## Core HTTP
+
+- [Router & Handlers](https://nelthaarion.github.io/breeze/docs/core/router/): Learn Breeze's router: exact-path and dynamic routes, inline vs. blocking handlers, middleware ordering, and static file serving.
+- [Context](https://nelthaarion.github.io/breeze/docs/core/context/): Breeze's per-request Context: reading params and query strings, writing JSON responses, binding and validation, and chain control.
+- [Performance Model](https://nelthaarion.github.io/breeze/docs/core/performance/): How Breeze achieves high throughput: inline execution on the gnet event loop, zero-copy headers, pooling, and the worker pool.
+- [Errors as Values](https://nelthaarion.github.io/breeze/docs/core/errors/): How Breeze handlers return errors, and how HTTPError, WrapHTTPError, and validation errors become HTTP responses.
+- [WebSocket](https://nelthaarion.github.io/breeze/docs/core/websocket/): Native WebSocket support in Breeze: WSConn, WSHub broadcast, ordered message delivery, and outbound connections with DialWS.
+- [Request Binding & Validation](https://nelthaarion.github.io/breeze/docs/core/binding/): Decode and validate HTTP requests in one call with Breeze's binding package: JSON body, query, form, and path parameter sources.
+- [Templates, SPA & i18n](https://nelthaarion.github.io/breeze/docs/core/templates/): Server-rendered views with a built-in SPA runtime for partial re-renders, plus locale-aware templates and pluralization.
+
+## Middleware & Security
+
+- [Middleware Reference](https://nelthaarion.github.io/breeze/docs/middleware/): Every built-in Breeze middleware — recovery, logging, rate limiting, CORS, security headers, JWT auth, compression — and the order to install them in.
+- [OAuth2 / Social Login](https://nelthaarion.github.io/breeze/docs/oauth2/): Zero-config OAuth2 login for Google, GitHub, Microsoft, and Discord with PKCE, CSRF protection, and signed sessions.
+
+## Data & Workflow
+
+- [Events](https://nelthaarion.github.io/breeze/docs/events/): Breeze's typed, reflection-free event bus: priorities, phases, filters, middleware, async dispatch, and framework-wide events.
+- [Workflows](https://nelthaarion.github.io/breeze/docs/workflows/): Durable workflow orchestration in Breeze: retries, timeouts, Saga-style compensation, crash recovery, and event-triggered workflows.
+- [Migrations](https://nelthaarion.github.io/breeze/docs/migrations/): Database migrations for Breeze: numbered SQL files, checksums, locking for concurrent deploys, and the migrate CLI.
+- [HTTP Client](https://nelthaarion.github.io/breeze/docs/http-client/): Breeze's gnet-based outbound HTTP client for service-to-service JSON traffic, connection pooling, and timeouts.
+
+## See Inside Your App
+
+- [Dashboard](https://nelthaarion.github.io/breeze/docs/dashboard/): A built-in developer dashboard for Breeze: live requests, request timeline profiler, query monitor, routes explorer, and health checks.
+- [Observability](https://nelthaarion.github.io/breeze/docs/observability/): Record and query what happened inside a running Breeze app: signals, spans, live streaming, metrics, and the execution graph.
+- [Diagnostics](https://nelthaarion.github.io/breeze/docs/diagnostics/): One endpoint that reports the live status of every Breeze subsystem — ok, degraded, off, or unknown — with zero cost when unused.
+- [Fleet Tracing](https://nelthaarion.github.io/breeze/docs/fleet-tracing/): Distributed tracing across Breeze services: W3C trace context propagation, topology graphs, root-cause analysis, and contract validation.
+
+## More Protocols
+
+- [JSON-RPC 2.0](https://nelthaarion.github.io/breeze/docs/rpc/): A JSON-RPC 2.0 server built on Breeze's gnet event loop, with a stdio transport for MCP and the same middleware model as the router.
+- [OpenAPI / Scalar](https://nelthaarion.github.io/breeze/docs/scalar/): Generate an OpenAPI 3 spec from declared route documentation, browse it with the Scalar UI, and serve an llms.txt for AI models.
+- [Video Streaming](https://nelthaarion.github.io/breeze/docs/video/): Byte-range video streaming for Breeze with seek support, signed URLs, path traversal protection, and live dashboard stats.
+- [MCP for AI Agents](https://nelthaarion.github.io/breeze/docs/mcp/): Expose the Breeze toolchain to AI agents over the Model Context Protocol, with scoped tokens, workspace confinement, and in-process serving.
+
+## Reference
+
+- [Repository Conventions](https://nelthaarion.github.io/breeze/docs/repository-structure/): The naming, file layout, error handling, and documentation rules the Breeze codebase follows, and why.
+- [Examples](https://nelthaarion.github.io/breeze/docs/examples/): Runnable Breeze examples for every subsystem: dashboard, events, workflows, video streaming, Fleet tracing, and Auto-MCP.
